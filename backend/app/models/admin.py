@@ -64,3 +64,49 @@ def verify_admin_code_from_db(email: str, code: str) -> bool:
     except Exception as e:
         logger.error(f"Database error in verify_admin_code_from_db: {e}")
         return False
+
+
+def update_teacher_password_in_db(new_password: str) -> bool:
+    """מעדכן את סיסמת המורים בDB"""
+    try:
+        with db_cursor() as (conn, cursor):
+            cursor.execute(
+                "UPDATE admin SET teacher_password = %s",
+                (new_password,)
+            )
+            conn.commit()
+            success = cursor.rowcount > 0
+
+            if success:
+                logger.info("Teacher password updated successfully in database")
+            else:
+                logger.warning("No rows affected when updating teacher password")
+
+            return success
+
+    except Exception as e:
+        logger.error(f"Database error in update_teacher_password_in_db: {e}")
+        return False
+
+
+def update_admin_email_in_db(old_email: str, new_email: str) -> bool:
+    """מעדכן את כתובת המייל של האדמין בDB"""
+    try:
+        with db_cursor() as (conn, cursor):
+            cursor.execute(
+                "UPDATE admin SET email = %s WHERE email = %s",
+                (new_email, old_email)
+            )
+            conn.commit()
+            success = cursor.rowcount > 0
+
+            if success:
+                logger.info(f"Admin email updated from {old_email} to {new_email}")
+            else:
+                logger.warning(f"No admin found with email {old_email}")
+
+            return success
+
+    except Exception as e:
+        logger.error(f"Database error in update_admin_email_in_db: {e}")
+        return False

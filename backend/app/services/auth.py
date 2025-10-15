@@ -8,7 +8,7 @@ from flask_jwt_extended import create_access_token
 from app.models.auth import get_teacher_password, verify_and_clear_admin_code, ensure_teacher_exists
 from app.models.admin import is_admin_email, save_admin_verification_code
 from app.utils.helpers import generate_verification_code
-from app.services.email_service import email_service
+from app.services.email_service import EmailService
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,6 @@ def login_admin_teacher_services(email: str, password: str) -> Dict[str, Any]:
     try:
         # בדיקת סיסמת מורים מול מה ששמור בDB
         stored_password = get_teacher_password()
-
         if not stored_password or stored_password != password:
             return {'success': False, 'message': 'Invalid password'}
 
@@ -25,10 +24,10 @@ def login_admin_teacher_services(email: str, password: str) -> Dict[str, Any]:
         if is_admin_email(email):
             # יצירת קוד + שמירה + שליחת מייל
             verification_code = generate_verification_code()
-
+            print("admin code: ", verification_code)
             if not save_admin_verification_code(email, verification_code):
                 return {'success': False, 'error': 'Failed to save verification code'}
-
+            email_service = EmailService()
             email_result = email_service.send_admin_verification_code(email, verification_code)
             if not email_result['success']:
                 return {'success': False, 'error': 'Failed to send verification email'}

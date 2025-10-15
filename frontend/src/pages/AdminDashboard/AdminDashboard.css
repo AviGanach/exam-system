@@ -1,0 +1,174 @@
+/* AdminDashboard.css */
+.admin-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  direction: rtl;
+}
+
+.dashboard-content {
+  max-width: 800px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-content h1 {
+  color: #1e293b;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.dashboard-content > p {
+  color: #64748b;
+  text-align: center;
+  margin-bottom: 3rem;
+  font-size: 1.1rem;
+}
+
+.password-section,
+.admin-info {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.password-section label,
+.email-section label {
+  display: block;
+  margin-bottom: 0.75rem;
+  color: #374151;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.password-input,
+.email-input {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.password-input:focus,
+.email-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  transform: translateY(-2px);
+}
+
+.update-password-btn,
+.update-email-btn {
+  width: 100%;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.update-password-btn:hover,
+.update-email-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
+}
+
+.update-password-btn:active,
+.update-email-btn:active {
+  transform: translateY(-1px);
+}
+
+.update-password-btn::before,
+.update-email-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.update-password-btn:hover::before,
+.update-email-btn:hover::before {
+  left: 100%;
+}
+
+.admin-info h2 {
+  color: #1e293b;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.admin-info > p {
+  color: #64748b;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+.email-section {
+  margin-top: 1.5rem;
+}
+
+/* רספונסיבי */
+@media (max-width: 768px) {
+  .admin-dashboard {
+    padding: 1rem;
+  }
+  
+  .dashboard-content {
+    padding: 2rem 1.5rem;
+  }
+  
+  .dashboard-content h1 {
+    font-size: 2rem;
+  }
+  
+  .password-section,
+  .admin-info {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-content h1 {
+    font-size: 1.8rem;
+  }
+  
+  .password-input,
+  .email-input {
+    font-size: 1rem;
+    padding: 0.875rem;
+  }
+  
+  .update-password-btn,
+  .update-email-btn {
+    font-size: 1rem;
+    padding: 0.875rem 1.5rem;
+  }
+}

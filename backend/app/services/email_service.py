@@ -2,9 +2,9 @@ import logging
 import os
 import smtplib
 import ssl
+from dotenv import load_dotenv
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from dotenv import load_dotenv
 
 load_dotenv()
 logger = logging.getLogger(__name__)
@@ -49,7 +49,6 @@ class EmailService:
 
     def send_admin_verification_code(self, admin_email, verification_code):
         """שולח קוד אימות דו-שלבי לאדמין"""
-
         subject = "קוד אימות - מערכת בחינות"
 
         html_content = f"""
@@ -82,6 +81,3 @@ class EmailService:
         """
 
         return self._send_email(admin_email, subject, html_content, text_content)
-
-# Singleton instance
-email_service = EmailService()
