@@ -1,5 +1,6 @@
-import random
+import secrets
+import string
 
-def generate_verification_code(length: int = 4) -> str:
-    """מייצר קוד אימות בן N ספרות (ברירת מחדל: 4)"""
-    return ''.join(random.choices('0123456789', k=length))
+def generate_verification_code():
+    """יוצר קוד אימות 4 ספרות"""
+    return ''.join(secrets.choice(string.digits) for _ in range(4))

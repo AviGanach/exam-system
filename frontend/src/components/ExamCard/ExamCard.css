@@ -1,0 +1,245 @@
+.exam-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.exam-card:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+}
+
+.exam-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.exam-card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  line-height: 1.3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.exam-card-description {
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.exam-code-section {
+  background: #f9fafb;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.exam-code-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.exam-code-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.exam-code-value {
+  font-size: 18px;
+  font-family: 'Courier New', monospace;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.copy-code-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.copy-code-btn:hover {
+  background: #2563eb;
+}
+
+.copy-code-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.exam-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.stat-item {
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+}
+
+.stat-item.duration {
+  background: #dbeafe;
+}
+
+.stat-item.submissions {
+  background: #f3e8ff;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.stat-value.duration {
+  color: #2563eb;
+}
+
+.stat-value.submissions {
+  color: #7c3aed;
+}
+
+.exam-dates {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.exam-dates div {
+  margin-bottom: 4px;
+}
+
+.exam-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.action-btn {
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.copy-btn {
+  background: #3b82f6;
+  color: white;
+}
+
+.copy-btn:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.view-btn {
+  background: #10b981;
+  color: white;
+}
+
+.view-btn:hover:not(:disabled) {
+  background: #059669;
+}
+
+.results-btn {
+  background: #8b5cf6;
+  color: white;
+}
+
+.results-btn:hover:not(:disabled) {
+  background: #7c3aed;
+}
+
+.exam-footer {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid;
+}
+
+.status-badge.active {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.status-badge.draft {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.status-badge.closed {
+  background: #fecaca;
+  color: #991b1b;
+  border-color: #fca5a5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .exam-card {
+    padding: 16px;
+  }
+  
+  .exam-card-title {
+    font-size: 18px;
+  }
+  
+  .exam-actions {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}

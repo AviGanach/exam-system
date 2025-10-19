@@ -1,9 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import { useState } from 'react';
-// import Header from './components/Header';
+
 import HomePage from './pages/HomePage';
 import AdminDashboard from './pages/AdminDashboard';
 import TeacherDashboard from './pages/TeacherDashboard';
+import CreateExam from './pages/CreateExam';
+import ExamView from './pages/ExamView';
+import EditExam from './pages/EditExam';
 import './App.css';
 
 interface User {
@@ -42,7 +45,13 @@ function App() {
             </Route>
 
             <Route path="/teacher" element={<AuthGuard requiredRole="teacher" />}>
-              <Route path="dashboard" element={<TeacherDashboard user={user} />} />
+              <Route path="dashboard" element={user ? <TeacherDashboard user={user} /> : <Navigate to="/" replace />} />
+              <Route path="exam/create" element={user ? <CreateExam user={user} /> : <Navigate to="/" replace />} />
+              <Route path="exam/:examId/view" element={user ? <ExamView user={user} /> : <Navigate to="/" replace />} />
+              <Route path="exam/:examId/edit" element={user ? <EditExam user={user} /> : <Navigate to="/" replace />} />
+
+              {/* <Route path="exam/:examId/results" element={<ExamResults user={user} />} />
+              <Route path="public-exams" element={<PublicExams user={user} />} /> */}
             </Route>
 
             <Route path="*" element={<Navigate to="/" replace />} />
