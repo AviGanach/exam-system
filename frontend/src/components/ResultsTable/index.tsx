@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import API_URL from '../../config';
+import './ResultsTable.css';
 
 interface User {
   token: string;
@@ -46,7 +48,7 @@ const ResultsTable: React.FC<ResultsTableProps> = ({ examId, user }) => {
     const fetchExamResults = async () => {
         try {
             setLoading(true);
-            const response = await fetch(`/api/teacher/exam/${examId}/results`, {
+            const response = await fetch(`${API_URL}/api/teacher/exam/${examId}/results`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${user.token}`,
@@ -72,7 +74,7 @@ const ResultsTable: React.FC<ResultsTableProps> = ({ examId, user }) => {
             setError(null);
             setSuccessMessage(null);
             
-            const response = await fetch(`/api/teacher/exam/${examId}/export_submissions`, {
+            const response = await fetch(`${API_URL}/api/teacher/exam/${examId}/export_submissions`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${user.token}`,

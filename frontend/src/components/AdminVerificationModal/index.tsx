@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import API_URL from '../../config';
 import './AdminVerificationModal.css';
+
 
 interface AdminVerificationModalProps {
   onClose: () => void;
@@ -34,7 +36,7 @@ const AdminVerificationModal = ({ onClose, onVerify, email, password }: AdminVer
       setIsLoading(true);
 
       // קריאה לשרת לשליחת קוד חדש
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import ExamInfoModal from '../ExamInfoModal';
+import API_URL from '../../config';
 import './ExamCodeModal.css';
 
 
@@ -22,7 +23,7 @@ const ExamCodeModal = ({ onClose }: ExamCodeModalProps) => {
     setError('');
 
     try {
-      const response = await fetch(`/api/student/exam_info/${examCode}`, {
+      const response = await fetch(`${API_URL}/api/student/exam_info/${examCode}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'

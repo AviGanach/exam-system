@@ -1,4 +1,3 @@
-// components/SubmissionsWarningModal.tsx
 import React from 'react';
 import './SubmissionsWarningModal.css';
 

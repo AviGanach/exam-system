@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+
 import QuestionsList from '../../components/QuestionsList';
+import API_URL from '../../config';
 import './EditExamContent.css';
 
 interface User {
@@ -45,7 +47,7 @@ const EditExamContent = ({ user }: EditExamContentProps) => {
     const fetchExamContent = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch(`/api/teacher/exam/${examId}/view`, {
+            const response = await fetch(`${API_URL}/api/teacher/exam/${examId}/view`, {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
 
@@ -157,7 +159,7 @@ const EditExamContent = ({ user }: EditExamContentProps) => {
                 questions: questions
             };
 
-            const response = await fetch(`/api/teacher/exam/${examId}/update_content`, {
+            const response = await fetch(`${API_URL}/api/teacher/exam/${examId}/update_content`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

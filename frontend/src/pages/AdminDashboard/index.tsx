@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import API_URL from '../../config';
 import './AdminDashboard.css';
 
 interface AdminDashboardProps {
@@ -17,7 +18,7 @@ const AdminDashboard = ({ user }: AdminDashboardProps) => {
   const fetchCurrentPassword = async () => {
     // שליפת הסיסמה הנוכחית מהשרת
     try {
-      const response = await fetch('/api/admin/teacher-password', {
+      const response = await fetch(`${API_URL}/api/admin/teacher-password`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
       const data = await response.json();
@@ -34,7 +35,7 @@ const AdminDashboard = ({ user }: AdminDashboardProps) => {
   const handlePasswordUpdate = async () => {
     // שליחת הסיסמה החדשה לשרת
     try {
-      const response = await fetch('/api/admin/update-teacher-password', {
+      const response = await fetch(`${API_URL}/api/admin/update-teacher-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -56,7 +57,7 @@ const AdminDashboard = ({ user }: AdminDashboardProps) => {
   const handleEmailUpdate = async () => {
     // שליחת המייל החדש לשרת
     try {
-      const response = await fetch('/api/admin/update-email', {
+      const response = await fetch(`${API_URL}/api/admin/update-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

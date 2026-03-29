@@ -9,7 +9,6 @@ import ExamView from './pages/ExamView';
 import EditExamDetails from './pages/EditExamDetails';
 import EditExamContent from './pages/EditExamContent';
 import ExamRegister from './pages/ExamRegister';
-import CodeQuestion from './components/questions/CodeQuestion';
 import ExamTakingPage from './pages/ExamTakingPage';
 import ExamResults from './pages/ExamResults';
 
@@ -36,7 +35,6 @@ function App() {
         <main>
           <Routes>
             <Route path="/" element={<HomePage setUser={setUser} />} />
-            <Route path="check" element={<CodeQuestion initial_code="" onChange={() => {}} />} />
 
             {/* ----- Admin Routes ----- */}
             <Route path="/admin" element={<AuthGuard requiredRole="admin" />}>

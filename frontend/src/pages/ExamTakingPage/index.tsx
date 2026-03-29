@@ -1,11 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
-import './ExamTakingPage.css';
+import { useNavigate, useParams } from 'react-router-dom';
+
 import OpenQuestion from '../../components/questions/OpenQuestion';
 import CodeQuestion from '../../components/CodeQuestion';
 import MultipleChoiceQuestion from '../../components/questions/MultipleChoiceQuestion';
 import ExamTimer from '../../components/ExamTimer';
 import AntiCheatMonitor from '../../components/AntiCheatMonitor';
-import { useNavigate, useParams } from 'react-router-dom';
+import API_URL from '../../config';
+import './ExamTakingPage.css';
+
 
 interface User {
   token: string;
@@ -88,7 +91,7 @@ const ExamTakingPage: React.FC<ExamTakingPageProps> = ({ user }) => {
       if (hasFetched.current) return;
       hasFetched.current = true;
       try {
-        const res = await fetch(`/api/student/exam_start/${examCode}`, {
+        const res = await fetch(`${API_URL}/api/student/exam_start/${examCode}`, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
         const data = await res.json();
@@ -194,7 +197,7 @@ const ExamTakingPage: React.FC<ExamTakingPageProps> = ({ user }) => {
         setIsSubmitting(true);
       }, 800);
 
-      const response = await fetch('/api/student/submit_exam', {
+      const response = await fetch(`${API_URL}/api/student/submit_exam`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
