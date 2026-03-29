@@ -1,0 +1,324 @@
+/* .exam-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #fafafa;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.exam-title {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.question-wrapper {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.question-number {
+  color: #555;
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+
+.question-text {
+  margin-bottom: 12px;
+}
+
+.exam-loading,
+.exam-error {
+  text-align: center;
+  margin-top: 60px;
+  font-size: 1.2rem;
+}
+
+.submit-btn {
+  display: block;
+  margin: 30px auto 0;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  background: #4caf50;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.submit-btn:hover {
+  background: #43a047;
+} */
+ /* הCSS המקורי שלך - בלי שינויים! */
+.exam-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #fafafa;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.exam-title {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 1.8rem;
+  color: #333;
+}
+
+.question-wrapper {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.question-number {
+  color: #555;
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+}
+
+.question-text {
+  margin-bottom: 12px;
+}
+
+.exam-loading,
+.exam-error {
+  text-align: center;
+  margin-top: 60px;
+  font-size: 1.2rem;
+}
+
+.submit-btn {
+  display: block;
+  margin: 30px auto 0;
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  background: #4caf50;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.submit-btn:hover {
+  background: #43a047;
+}
+
+/* ===== רק האנימציות החדשות - בלי לשנות כלום אחר! ===== */
+
+.submit-button-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 120px;
+  margin-top: 40px;
+}
+
+/* כפתור בתוך הקונטיינר */
+.submit-button-container .submit-btn {
+  position: relative;
+  margin: 0;
+  padding: 15px 40px;
+  font-size: 18px;
+  border-radius: 25px;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+}
+
+.submit-button-container .submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+/* אנימציות הפיצוץ */
+.explosion-container {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.explosion-particle {
+  position: absolute;
+  font-size: 24px;
+  animation: explode 0.8s ease-out forwards;
+}
+
+.particle-1 { animation-delay: 0s; --dx: 80px; --dy: -80px; }
+.particle-2 { animation-delay: 0.05s; --dx: -80px; --dy: -80px; }
+.particle-3 { animation-delay: 0.1s; --dx: 80px; --dy: 80px; }
+.particle-4 { animation-delay: 0.15s; --dx: -80px; --dy: 80px; }
+.particle-5 { animation-delay: 0.2s; --dx: 120px; --dy: 0px; }
+.particle-6 { animation-delay: 0.25s; --dx: -120px; --dy: 0px; }
+.particle-7 { animation-delay: 0.3s; --dx: 0px; --dy: -120px; }
+.particle-8 { animation-delay: 0.35s; --dx: 0px; --dy: 120px; }
+
+@keyframes explode {
+  0% {
+    transform: scale(1) translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5) translate(var(--dx), var(--dy)) rotate(180deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0) translate(var(--dx), var(--dy)) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.button-fragment {
+  position: absolute;
+  font-size: 16px;
+  font-weight: bold;
+  color: #4caf50;
+  animation: fragment-fly 0.8s ease-out forwards;
+}
+
+.fragment-1 { --fx: -60px; --fy: -40px; }
+.fragment-2 { --fx: 60px; --fy: -40px; }
+.fragment-3 { --fx: -40px; --fy: 60px; }
+.fragment-4 { --fx: 40px; --fy: 60px; }
+
+@keyframes fragment-fly {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--fx), var(--fy)) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* אנימציית הטעינה */
+.submission-animation {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.rocket-loading {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rocket {
+  font-size: 48px;
+  animation: rocket-fly 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 10px rgba(255, 193, 7, 0.6));
+}
+
+@keyframes rocket-fly {
+  0%, 100% {
+    transform: translateY(0px) rotate(-10deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(10deg);
+  }
+}
+
+.rocket-trail {
+  display: flex;
+  gap: 5px;
+}
+
+.trail-particle {
+  width: 8px;
+  height: 8px;
+  background: linear-gradient(45deg, #fbbf24, #f59e0b);
+  border-radius: 50%;
+  animation: trail-particle 0.6s ease-in-out infinite;
+}
+
+.trail-particle:nth-child(1) { animation-delay: 0s; }
+.trail-particle:nth-child(2) { animation-delay: 0.2s; }
+.trail-particle:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes trail-particle {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.3;
+  }
+}
+
+.loading-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+.loading-emoji {
+  font-size: 24px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+.loading-dots {
+  display: flex;
+  gap: 4px;
+}
+
+.loading-dots span {
+  width: 8px;
+  height: 8px;
+  background-color: #4caf50;
+  border-radius: 50%;
+  animation: loading-dot 1.4s ease-in-out infinite both;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+.loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+.loading-dots span:nth-child(3) { animation-delay: 0s; }
+
+@keyframes loading-dot {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+/* רספונסיבי */
+@media (max-width: 768px) {
+  .rocket {
+    font-size: 36px;
+  }
+  
+  .explosion-particle {
+    font-size: 20px;
+  }
+}

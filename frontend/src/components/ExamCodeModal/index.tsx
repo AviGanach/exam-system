@@ -22,7 +22,7 @@ const ExamCodeModal = ({ onClose }: ExamCodeModalProps) => {
     setError('');
 
     try {
-      const response = await fetch(`/api/student/exam/${examCode}`, {
+      const response = await fetch(`/api/student/exam_info/${examCode}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'

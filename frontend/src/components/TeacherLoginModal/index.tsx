@@ -11,6 +11,7 @@ interface TeacherLoginModalProps {
 
 const TeacherLoginModal = ({ onClose, setUser }: TeacherLoginModalProps) => {
   const [email, setEmail] = useState('');
+  const [email2, setEmail2] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -22,7 +23,13 @@ const TeacherLoginModal = ({ onClose, setUser }: TeacherLoginModalProps) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-
+    if (email != email2) {
+      alert('האימיילים אינם תואמים');
+      setIsLoading(false);
+      setEmail('');
+      setEmail2('');
+      return;
+    }
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -123,6 +130,15 @@ const TeacherLoginModal = ({ onClose, setUser }: TeacherLoginModalProps) => {
                 className="teacher-form-input"
                 disabled={isLoading}
               />
+                            <input
+                id='email'
+                type="email"
+                value={email2}
+                onChange={(e) => setEmail2(e.target.value)}
+                placeholder="הכנס את האימייל שלך שנית"
+                className="teacher-form-input"
+                disabled={isLoading}
+              />
             </div>
 
             <div className="teacher-form-group">
@@ -149,7 +165,7 @@ const TeacherLoginModal = ({ onClose, setUser }: TeacherLoginModalProps) => {
             <button
               type="submit"
               className="teacher-login-button"
-              disabled={isLoading || !email || !password}
+              disabled={isLoading || !email || !email2 || !password}
             >
               {isLoading ? 'מתחבר...' : 'התחבר'}
             </button>

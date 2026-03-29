@@ -33,18 +33,16 @@ interface Question {
   question_text: string;
   question_type: 'multiple_choice' | 'open_text' | 'code';
   points: number;
+  correct_answer?: string;
   options?: { letter: string; text: string; is_correct: boolean }[];
-  
-  // שדות לשאלות קוד
   programming_language?: string;
   initial_code?: string;
-  expected_output?: string;
 }
 
 const CreateExam = ({ user }: CreateExamProps) => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
-  
+
   const [examDetails, setExamDetails] = useState<ExamDetails>({
     title: '',
     description: '',
@@ -54,7 +52,7 @@ const CreateExam = ({ user }: CreateExamProps) => {
     end_time: '',
     show_timer: true,
     show_grade_immediately: false,
-    track_window_switches: true
+    track_window_switches: true,
   });
 
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -78,7 +76,7 @@ const CreateExam = ({ user }: CreateExamProps) => {
       alert('יש להזין כותרת למבחן');
       return false;
     }
-    
+
     if (questions.length === 0) {
       alert('יש להוסיף לפחות שאלה אחת');
       return false;
@@ -92,13 +90,14 @@ const CreateExam = ({ user }: CreateExamProps) => {
 
     // ולידציה לשאלות אמריקאיות
     const multipleChoiceQuestions = questions.filter(q => q.question_type === 'multiple_choice');
-    const invalidMCQuestions = multipleChoiceQuestions.filter(q => 
-      !q.options || 
-      q.options.length < 2 || 
+    const invalidMCQuestions = multipleChoiceQuestions.filter(q =>
+      !q.options ||
+      q.options.length < 2 ||
+      !q.correct_answer ||
       !q.options.some(opt => opt.is_correct) ||
       q.options.some(opt => !opt.text.trim())
     );
-    
+
     if (invalidMCQuestions.length > 0) {
       alert('יש שאלות אמריקאיות לא תקינות (חסרות אפשרויות או תשובה נכונה)');
       return false;
@@ -106,10 +105,10 @@ const CreateExam = ({ user }: CreateExamProps) => {
 
     // ולידציה לשאלות קוד
     const codeQuestions = questions.filter(q => q.question_type === 'code');
-    const invalidCodeQuestions = codeQuestions.filter(q => 
-      !q.programming_language || !q.expected_output?.trim()
+    const invalidCodeQuestions = codeQuestions.filter(q =>
+      !q.programming_language
     );
-    
+
     if (invalidCodeQuestions.length > 0) {
       alert('יש שאלות קוד חסרות שפת תכנות או פלט צפוי');
       return false;
@@ -129,12 +128,14 @@ const CreateExam = ({ user }: CreateExamProps) => {
         status
       };
 
+      console.log(examData);
       const response = await fetch('/api/teacher/create-exam', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${user.token}`
         },
+
         body: JSON.stringify(examData)
       });
 
@@ -160,7 +161,8 @@ const CreateExam = ({ user }: CreateExamProps) => {
       id: `q_${Date.now()}`,
       question_text: '',
       question_type: 'multiple_choice',
-      points: 1,
+      points: 10,
+      correct_answer: '',
       options: [
         { letter: 'A', text: '', is_correct: false },
         { letter: 'B', text: '', is_correct: false },
@@ -192,22 +194,22 @@ const CreateExam = ({ user }: CreateExamProps) => {
           <div className="header-content">
             <h1 className="page-title">יצירת מבחן חדש</h1>
             <div className="header-actions">
-              <button 
-                className="btn btn-cancel" 
+              <button
+                className="btn btn-cancel"
                 onClick={handleCancel}
                 disabled={isSaving}
               >
                 ביטול
               </button>
-              <button 
-                className="btn btn-save" 
+              <button
+                className="btn btn-save"
                 onClick={() => saveExam('draft')}
                 disabled={isSaving}
               >
                 {isSaving ? 'שומר...' : 'שמירה כטיוטה'}
               </button>
-              <button 
-                className="btn btn-publish" 
+              <button
+                className="btn btn-publish"
                 onClick={() => saveExam('active')}
                 disabled={isSaving}
               >
@@ -219,11 +221,11 @@ const CreateExam = ({ user }: CreateExamProps) => {
 
         <div className="create-exam-content">
           <main className="main-content">
-            <ExamDetailsForm 
-              examDetails={examDetails} 
-              setExamDetails={setExamDetails} 
+            <ExamDetailsForm
+              examDetails={examDetails}
+              setExamDetails={setExamDetails}
             />
-            
+
             <QuestionsList
               questions={questions}
               onAddQuestion={addQuestion}
@@ -233,7 +235,7 @@ const CreateExam = ({ user }: CreateExamProps) => {
           </main>
 
           <aside className="sidebar">
-            <ExamSidebar 
+            <ExamSidebar
               questionsCount={questions.length}
               totalPoints={getTotalPoints()}
               examDetails={examDetails}

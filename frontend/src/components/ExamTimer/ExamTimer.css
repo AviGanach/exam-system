@@ -1,0 +1,158 @@
+/* ExamTimer.css */
+
+.exam-timer {
+  position: sticky;
+  top: 20px;
+  left: 20px;
+  margin: 0 0 20px auto;
+  width: fit-content;
+  background: white;
+  border-radius: 12px;
+  padding: 15px 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 1000;
+  min-width: 150px;
+  border: 2px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.timer-icon {
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.timer-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.timer-label {
+  font-size: 11px;
+  color: #6b7280;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.timer-display {
+  font-size: 20px;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  direction: ltr;
+}
+
+/* מצבים שונים של הטיימר */
+.timer-normal {
+  border-color: #10b981;
+  background: linear-gradient(135deg, #ecfdf5, #ffffff);
+}
+
+.timer-normal .timer-display {
+  color: #059669;
+}
+
+.timer-warning {
+  border-color: #f59e0b;
+  background: linear-gradient(135deg, #fef3c7, #ffffff);
+  animation: warning-pulse 2s ease-in-out infinite;
+}
+
+.timer-warning .timer-display {
+  color: #d97706;
+}
+
+.timer-critical {
+  border-color: #dc2626;
+  background: linear-gradient(135deg, #fee2e2, #ffffff);
+  animation: critical-pulse 1s ease-in-out infinite;
+}
+
+.timer-critical .timer-display {
+  color: #dc2626;
+}
+
+/* אנימציות */
+@keyframes warning-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 6px 16px rgba(245, 158, 11, 0.25);
+  }
+}
+
+@keyframes critical-pulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(220, 38, 38, 0.5);
+  }
+}
+
+/* אפקט Pulse עבור מצב קריטי */
+.timer-pulse {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 20px;
+  height: 20px;
+}
+
+.pulse-ring {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #dc2626;
+  border-radius: 50%;
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8);
+    opacity: 0;
+  }
+}
+
+/* רספונסיבי */
+@media (max-width: 768px) {
+  .exam-timer {
+    position: static;
+    margin: 0 auto 20px;
+    width: fit-content;
+  }
+  
+  .timer-display {
+    font-size: 18px;
+  }
+  
+  .timer-icon {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .exam-timer {
+    padding: 12px 16px;
+  }
+  
+  .timer-display {
+    font-size: 16px;
+  }
+  
+  .timer-label {
+    font-size: 10px;
+  }
+}

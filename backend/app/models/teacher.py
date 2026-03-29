@@ -51,40 +51,6 @@ def get_exams_by_teacher_id(teacher_id: int) -> Optional[List[Dict[str, Any]]]:
         logger.error(f"Database error in get_exams_by_teacher_id: {e}")
         return None
 
-def create_exam_in_db(exam_details: Dict[str, Any]) -> Optional[int]:
-    """יוצר מבחן חדש במסד הנתונים"""
-    try:
-        with db_cursor() as (conn, cursor):
-            cursor.execute("""
-                INSERT INTO exams (
-                    teacher_id, exam_code, title, description, 
-                    duration_minutes, passing_grade, start_time, end_time,
-                    show_timer, show_grade_immediately, track_window_switches,
-                    max_score, status
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-            """, (
-                exam_details['teacher_id'],
-                exam_details['exam_code'],
-                exam_details['title'],
-                exam_details['description'],
-                exam_details['duration_minutes'],
-                exam_details['passing_grade'],
-                exam_details['start_time'],
-                exam_details['end_time'],
-                exam_details['show_timer'],
-                exam_details['show_grade_immediately'],
-                exam_details['track_window_switches'],
-                exam_details['max_score'],
-                exam_details['status']
-            ))
-            conn.commit()
-            return cursor.lastrowid
-
-    except Exception as e:
-        logger.error(f"Database error in create_exam_in_db: {e}")
-        return None
-
-
 def create_questions_in_db(exam_id: int, questions: List[Dict[str, Any]]) -> bool:
     """יוצר שאלות למבחן במסד הנתונים"""
     try:
@@ -93,18 +59,18 @@ def create_questions_in_db(exam_id: int, questions: List[Dict[str, Any]]) -> boo
                 # יצירת השאלה
                 cursor.execute("""
                                     INSERT INTO questions (
-                                        exam_id, question_text, question_type, points, question_order,
-                                        programming_language, initial_code, expected_output
+                                        exam_id, question_text, question_type, correct_answer, points, question_order,
+                                        programming_language, initial_code
                                     ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 """, (
                     exam_id,
                     question['question_text'],
                     question['question_type'],
+                    question['correct_answer'],
                     question.get('points', 1),
                     i + 1,
                     question.get('programming_language'),  # NULL אם לא קיים
                     question.get('initial_code'),          # NULL אם לא קיים
-                    question.get('expected_output')        # NULL אם לא קיים
                 ))
 
                 question_id = cursor.lastrowid
@@ -134,7 +100,6 @@ def create_questions_in_db(exam_id: int, questions: List[Dict[str, Any]]) -> boo
 def get_exam_with_questions_for_teacher(exam_id: int, teacher_id: int) -> Optional[Dict[str, Any]]:
     """שולף מבחן עם שאלות - רק אם המורה הוא הבעלים"""
     try:
-        print(555)
         with db_cursor() as (conn, cursor):
             # שליפת המבחן עם בדיקת בעלות
             cursor.execute("""
@@ -153,8 +118,8 @@ def get_exam_with_questions_for_teacher(exam_id: int, teacher_id: int) -> Option
 
             # שליפת השאלות
             cursor.execute("""
-                SELECT id, question_text, question_type, points, question_order,
-                       programming_language, initial_code, expected_output
+                SELECT id, question_text, question_type,correct_answer, points, question_order,
+                       programming_language, initial_code
                 FROM questions 
                 WHERE exam_id = %s 
                 ORDER BY question_order
@@ -174,6 +139,7 @@ def get_exam_with_questions_for_teacher(exam_id: int, teacher_id: int) -> Option
                     question['options'] = cursor.fetchall()
 
             exam['questions'] = questions
+            print(exam)
             return exam
 
     except Exception as e:

@@ -1,0 +1,41 @@
+/* CodeQuestion local scope */
+.cq-wrapper {
+  width: 100%;
+  min-height: 360px;        /* מבטיח לאפס 0x0 */
+  box-sizing: border-box;
+  direction: rtl;           /* שמר על RTL סביבת השאלה */
+  margin: 12px 0;
+}
+
+.cq-toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+  justify-content: flex-start;
+}
+
+.cq-language-select {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+.cq-theme-btn {
+  padding: 6px 8px;
+  border-radius: 6px;
+  border: 1px solid #888;
+  background: #f2f2f2;
+  cursor: pointer;
+}
+
+/* העורך עצמו צריך LTR כדי שהסמן והמיקום יהיו נכונים */
+.cq-editor-container {
+  direction: ltr;           /* קריטי */
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  min-height: 300px;
+}

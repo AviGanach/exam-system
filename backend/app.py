@@ -12,6 +12,7 @@ from app.routes.auth import auth_bp
 from app.routes.student import student_bp
 from app.routes.teacher import teacher_bp
 
+
 load_dotenv()
 app = Flask(__name__)
 # הגדרות CORS

@@ -1,0 +1,111 @@
+@startuml
+title Exam System - Entity Relationship Diagram
+
+entity "admins" {
+  *admin_id : int
+  --
+  name : varchar
+  email : varchar
+  password_hash : varchar
+  created_at : datetime
+}
+
+entity "teachers" {
+  *teacher_id : int
+  --
+  name : varchar
+  email : varchar
+  created_at : datetime
+}
+
+entity "exams" {
+  *exam_id : int
+  --
+  teacher_id : int
+  title : varchar
+  description : text
+  exam_code : varchar
+  max_score : int
+  status : varchar
+  created_at : datetime
+  updated_at : datetime
+}
+
+entity "questions" {
+  *question_id : int
+  --
+  exam_id : int
+  question_text : text
+  question_type : enum
+  correct_answer : text
+  points : int
+  question_order : int
+  programming_language : varchar
+  starting_code : text
+  expected_output : text
+  created_at : datetime
+}
+
+entity "question_options" {
+  *option_id : int
+  --
+  question_id : int
+  option_letter : char
+  option_text : text
+}
+
+entity "students" {
+  *student_id : int
+  --
+  name : varchar
+  email : varchar
+  id_number : varchar
+  created_at : datetime
+}
+
+entity "exam_submissions" {
+  *submission_id : int
+  --
+  exam_id : int
+  student_id : int
+  start_time : datetime
+  end_time : datetime
+  total_score : int
+  max_score : int
+  window_switches : int
+  created_at : datetime
+}
+
+entity "student_answers" {
+  *answer_id : int
+  --
+  submission_id : int
+  question_id : int
+  selected_option : varchar
+  code_answer : text
+  open_answer : text
+  is_correct : boolean
+  score : int
+  max_question_score : int
+  answered_at : datetime
+}
+
+entity "student_photos" {
+  *photo_id : int
+  --
+  submission_id : int
+  photo_url : text
+  captured_at : datetime
+}
+
+admins ||--o{ teachers : manages
+teachers ||--o{ exams : creates
+exams ||--o{ questions : contains
+questions ||--o{ question_options : has
+exams ||--o{ exam_submissions : assigned_to
+students ||--o{ exam_submissions : participates_in
+exam_submissions ||--o{ student_answers : includes
+exam_submissions ||--o{ student_photos : captured_during
+questions ||--o{ student_answers : answered_in
+
+@enduml

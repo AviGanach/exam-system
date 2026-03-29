@@ -5,8 +5,9 @@ from typing import Dict, Any
 
 from flask_jwt_extended import create_access_token
 
-from app.models.exam import get_exam_inpo_by_code, is_exam_available
-from app.models.student import get_or_create_student, get_student_exam_status
+from app.models.exam import get_exam_info_by_code, is_exam_available
+from app.models.exam_submission import get_submission_status_by_student
+from app.models.student import get_or_create_student
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +15,7 @@ def register_student_for_exam(name: str, id_number: str, email: str, exam_code: 
     """רושם תלמיד למבחן ויוצר JWT"""
     try:
         # בדיקה שהמבחן קיים וזמין
-        exam = get_exam_inpo_by_code(exam_code)
+        exam = get_exam_info_by_code(exam_code)
         if not exam:
             return {'success': False, 'message': 'Exam not found'}
 
@@ -26,19 +27,24 @@ def register_student_for_exam(name: str, id_number: str, email: str, exam_code: 
         if not student_id:
             return {'success': False, 'error': 'Failed to create student record'}
 
-        # בדיקה שהתלמיד לא עשה את המבחן כבר
-        exam_status = get_student_exam_status(student_id, exam['id'])
+        # בדיקה שהתלמיד לא עשה את המבחן כבר שאין רשומה על שמו או אם יש שהסטטוס שונה מcompleted
+            # בדיקה שהתלמיד לא עשה את המבחן כבר
+        status_result = get_submission_status_by_student(student_id, exam['id'])
 
-        if exam_status['exists']:
-            if exam_status['end_time']: # יש זמן סיום בDB
-                return {'success': False, 'message': 'Student has already completed this exam'}
-            else:  # in_progress
-                return {
-                    'success': True,
-                    'message': 'Student has exam in progress - can continue',
-                    'resume_exam': True,
-                    'submission_id': exam_status['submission_id']
-                }
+        # בדיקה אם הייתה שגיאה בDB
+        if not status_result['success']:
+            logger.error(f"Database error checking submission status: {status_result.get('error')}")
+            return {
+                'success': False,
+                'message': 'Database error while checking submission status'
+            }
+
+        # עכשיו אפשר לבדוק בבטחה
+        if status_result['found'] and status_result['status'] == 'completed':
+            return {
+                'success': False,
+                'message': 'You have already completed this exam'
+            }
 
         # יצירת JWT
         access_token = create_access_token(

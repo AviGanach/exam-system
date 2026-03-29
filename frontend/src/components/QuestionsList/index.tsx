@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './QuestionsList.css';
 
 interface Question {
@@ -6,12 +6,12 @@ interface Question {
   question_text: string;
   question_type: 'multiple_choice' | 'open_text' | 'code';
   points: number;
+  correct_answer?: string;
   options?: { letter: string; text: string; is_correct: boolean }[];
-  
+
   // שדות לשאלות קוד
   programming_language?: string;
   initial_code?: string;
-  expected_output?: string;
 }
 
 interface QuestionsListProps {
@@ -22,9 +22,11 @@ interface QuestionsListProps {
 }
 
 const QuestionsList = ({ questions, onAddQuestion, onUpdateQuestion, onDeleteQuestion }: QuestionsListProps) => {
+  console.log("questions", questions);
+
   const [editingQuestion, setEditingQuestion] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Question | null>(null);
-  
+
   // State for code editor preferences
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isLTR, setIsLTR] = useState(true);
@@ -41,6 +43,18 @@ const QuestionsList = ({ questions, onAddQuestion, onUpdateQuestion, onDeleteQue
     { value: 'java', label: 'Java' },
     { value: 'cpp', label: 'C++' }
   ];
+// אם נרצה שמיד בלחיצה על הוסף שאלה חדשה יפתח טופס מילויי השאלה
+  // useEffect(() => {
+  //   if (questions.length > 0) {
+  //     const lastQuestion = questions[questions.length - 1];
+
+  //     // בדוק אם השאלה האחרונה ריקה (= חדשה) ולא נמצאת כבר בעריכה
+  //     if (!lastQuestion.question_text.trim() && editingQuestion !== lastQuestion.id) {
+  //       setEditingQuestion(lastQuestion.id);
+  //       setEditForm({ ...lastQuestion });
+  //     }
+  //   }
+  // }, [questions.length]);
 
   const startEditing = (question: Question) => {
     setEditingQuestion(question.id);
@@ -53,6 +67,8 @@ const QuestionsList = ({ questions, onAddQuestion, onUpdateQuestion, onDeleteQue
   };
 
   const saveQuestion = () => {
+    console.log(editForm);
+
     if (editForm && editingQuestion) {
       if (!editForm.question_text.trim()) {
         alert('יש להזין טקסט שאלה');
@@ -60,14 +76,14 @@ const QuestionsList = ({ questions, onAddQuestion, onUpdateQuestion, onDeleteQue
       }
 
       if (editForm.question_type === 'multiple_choice') {
-        const hasCorrectAnswer = editForm.options?.some(opt => opt.is_correct);
+        const hasCorrectAnswer = editForm.options?.some(opt => opt.is_correct) && editForm.correct_answer;
         const hasEmptyOptions = editForm.options?.some(opt => !opt.text.trim());
-        
+
         if (!hasCorrectAnswer) {
           alert('יש לבחור תשובה נכונה');
           return;
         }
-        
+
         if (hasEmptyOptions) {
           alert('יש למלא את כל האפשרויות');
           return;
@@ -81,9 +97,10 @@ const QuestionsList = ({ questions, onAddQuestion, onUpdateQuestion, onDeleteQue
 
   const updateEditForm = (field: keyof Question, value: any) => {
     if (!editForm) return;
-    
+
     const updated = { ...editForm, [field]: value };
-    
+    console.log(111, value);
+
     // אם שינו את סוג השאלה, צריך להתאים את האפשרויות
     if (field === 'question_type') {
       if (value === 'multiple_choice') {
@@ -93,34 +110,37 @@ const QuestionsList = ({ questions, onAddQuestion, onUpdateQuestion, onDeleteQue
           { letter: 'C', text: '', is_correct: false },
           { letter: 'D', text: '', is_correct: false }
         ];
+
+        updated.correct_answer = undefined;
         // נקה שדות קוד
         updated.programming_language = undefined;
         updated.initial_code = undefined;
-        updated.expected_output = undefined;
       } else if (value === 'code') {
         // נקה אפשרויות אמריקאיות והגדר ברירות מחדל לקוד
         updated.options = undefined;
         updated.programming_language = 'python';
         updated.initial_code = '';
-        updated.expected_output = '';
+        updated.correct_answer = undefined;
       } else {
         // open_text - נקה הכל
         updated.options = undefined;
         updated.programming_language = undefined;
         updated.initial_code = undefined;
-        updated.expected_output = undefined;
+        updated.correct_answer = undefined;
       }
     }
-    
+
     setEditForm(updated);
   };
 
   const updateOption = (index: number, field: 'text' | 'is_correct', value: string | boolean) => {
     if (!editForm?.options) return;
-    
+
+    let correctLetter: string | undefined = editForm.correct_answer;
     const updatedOptions = editForm.options.map((opt, i) => {
       if (i === index) {
         if (field === 'is_correct' && value === true) {
+          correctLetter = opt.letter;
           return { ...opt, is_correct: true };
         } else if (field === 'is_correct' && value === false) {
           return { ...opt, is_correct: false };
@@ -133,20 +153,21 @@ const QuestionsList = ({ questions, onAddQuestion, onUpdateQuestion, onDeleteQue
       }
       return opt;
     });
-    
-    setEditForm({ ...editForm, options: updatedOptions });
+
+    setEditForm({ ...editForm, options: updatedOptions, correct_answer: correctLetter });
   };
 
   const getQuestionTypeText = (type: string) => {
     const typeMap = {
       'multiple_choice': 'אמריקאית',
-      'open_text': 'פתוחה', 
+      'open_text': 'פתוחה',
       'code': 'שאלת קוד'
     };
     return typeMap[type as keyof typeof typeMap] || type;
   };
 
   const renderQuestionItem = (question: Question, index: number) => {
+    console.log("index", index);
     if (editingQuestion === question.id) {
       return (
         <div key={question.id} className="question-form">
@@ -181,8 +202,8 @@ const QuestionsList = ({ questions, onAddQuestion, onUpdateQuestion, onDeleteQue
                 <input
                   type="number"
                   className="form-input"
-                  value={editForm?.points || 1}
-                  onChange={(e) => updateEditForm('points', parseInt(e.target.value) || 1)}
+                  value={editForm?.points || 10}
+                  onChange={(e) => updateEditForm('points', parseInt(e.target.value) || 10)}
                   min="1"
                 />
               </div>
@@ -259,33 +280,19 @@ const QuestionsList = ({ questions, onAddQuestion, onUpdateQuestion, onDeleteQue
                   />
                 </div>
               </div>
-
-              <div className="form-group">
-                <label className="form-label">פלט צפוי</label>
-                <textarea
-                  className="form-input"
-                  value={editForm?.expected_output || ''}
-                  onChange={(e) => updateEditForm('expected_output', e.target.value)}
-                  placeholder="True\nFalse\nTrue"
-                  rows={4}
-                />
-                <div className="expected-output-help">
-                  <div className="help-title">דוגמאות לפלט צפוי:</div>
-                  <div className="help-examples">
-                    <strong>פונקציה שבודקת ראשוניות:</strong><br/>
-                    is_prime(7) → True<br/>
-                    is_prime(10) → False<br/><br/>
-                    
-                    <strong>פונקציה שמחזירה רשימה:</strong><br/>
-                    [1, 2, 3, 4, 5]<br/><br/>
-                    
-                    <strong>מספר פלטים:</strong><br/>
-                    True<br/>
-                    False<br/>
-                    True
-                  </div>
-                </div>
-              </div>
+            </div>
+          )}
+          {/* תשובה נכונה לשאלות פתוחות וקוד */}
+          {(editForm?.question_type === 'open_text' || editForm?.question_type === 'code') && (
+            <div className="form-group">
+              <label className="form-label">התשובה הנכונה</label>
+              <textarea
+                className="form-input"
+                value={editForm?.correct_answer || ''}
+                onChange={(e) => updateEditForm('correct_answer', e.target.value)}
+                placeholder="תאר את התשובה הנכונה"
+                rows={3}
+              />
             </div>
           )}
 
@@ -343,10 +350,10 @@ const QuestionsList = ({ questions, onAddQuestion, onUpdateQuestion, onDeleteQue
             {question.options.map((option) => (
               <div
                 key={option.letter}
-                className={`option-item ${option.is_correct ? 'option-correct' : ''}`}
+                className={`option-item ${option.is_correct ? 'option-correct' : 'option-wrong'}`}
               >
                 {option.letter}. {option.text}
-                {option.is_correct && ' ✓'}
+                {option.is_correct ? ' ✓' : ' ✗'}
               </div>
             ))}
           </div>
@@ -360,12 +367,7 @@ const QuestionsList = ({ questions, onAddQuestion, onUpdateQuestion, onDeleteQue
                 <pre className="code-content">{question.initial_code}</pre>
               </div>
             )}
-            {question.expected_output && (
-              <div className="code-block">
-                <div className="code-label">פלט צפוי:</div>
-                <pre className="code-content">{question.expected_output}</pre>
-              </div>
-            )}
+
           </div>
         )}
       </div>
@@ -375,7 +377,7 @@ const QuestionsList = ({ questions, onAddQuestion, onUpdateQuestion, onDeleteQue
   return (
     <div className="questions-section">
       <h2 className="section-title">שאלות המבחן</h2>
-      
+
       <div className="questions-list">
         {questions.length === 0 ? (
           <div className="empty-questions">

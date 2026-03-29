@@ -34,32 +34,16 @@ interface Question {
     question_text: string;
     question_type: 'multiple_choice' | 'open_text' | 'code';
     points: number;
+    correct_answer?: string;
     options?: { letter: string; text: string; is_correct: boolean }[];
     programming_language?: string;
     initial_code?: string;
-    expected_output?: string;
-}
-
-interface Exam {
-    id: number;
-    exam_code: string;
-    title: string;
-    description: string;
-    duration_minutes: number;
-    passing_grade: number;
-    start_time: string | null;
-    end_time: string | null;
-    show_timer: boolean;
-    show_grade_immediately: boolean;
-    track_window_switches: boolean;
-    status: 'draft' | 'active' | 'closed';
-    questions: any[];
+    correct_output?: string;
 }
 
 const EditExam = ({ user }: EditExamProps) => {
     const navigate = useNavigate();
     const { examId } = useParams<{ examId: string }>();
-
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
     const [isSaving, setIsSaving] = useState(false);
@@ -74,7 +58,7 @@ const EditExam = ({ user }: EditExamProps) => {
         end_time: '',
         show_timer: true,
         show_grade_immediately: false,
-        track_window_switches: true
+        track_window_switches: true,
     });
 
     const [questions, setQuestions] = useState<Question[]>([]);
@@ -83,6 +67,35 @@ const EditExam = ({ user }: EditExamProps) => {
     useEffect(() => {
         fetchExam();
     }, [examId]);
+
+    // פונקציות עזר לטיפול בתאריכים
+    const formatDateForInput = (dateString: string): string => {
+        if (!dateString) return '';
+        
+        try {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return '';
+            
+            // פורמט datetime-local: "2026-01-13T10:30"
+            return date.toISOString().slice(0, 16);
+        } catch (e) {
+            return '';
+        }
+    };
+
+    const formatDateForServer = (dateString: string): string => {
+        if (!dateString) return '';
+        
+        try {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return '';
+            
+            // פורמט MySQL: "2026-01-13 10:30:00"
+            return date.toISOString().slice(0, 19).replace('T', ' ');
+        } catch (e) {
+            return '';
+        }
+    };
 
     const fetchExam = async () => {
         try {
@@ -95,7 +108,8 @@ const EditExam = ({ user }: EditExamProps) => {
                 const data = await response.json();
                 if (data.success) {
                     const exam = data.exam;
-
+                    console.log("exam", exam);
+                    
                     // שמירת נתונים מקוריים להשוואה
                     setOriginalData(exam);
                     setExamCode(exam.exam_code);
@@ -106,11 +120,12 @@ const EditExam = ({ user }: EditExamProps) => {
                         description: exam.description || '',
                         duration_minutes: exam.duration_minutes || 60,
                         passing_grade: exam.passing_grade || 60,
-                        start_time: exam.start_time ? exam.start_time.slice(0, 16) : '',
-                        end_time: exam.end_time ? exam.end_time.slice(0, 16) : '',
+                        // תיקון התאריכים לפורמט datetime-local
+                        start_time: exam.start_time ? formatDateForInput(exam.start_time) : '',
+                        end_time: exam.end_time ? formatDateForInput(exam.end_time) : '',
                         show_timer: exam.show_timer ?? true,
                         show_grade_immediately: exam.show_grade_immediately ?? false,
-                        track_window_switches: exam.track_window_switches ?? true
+                        track_window_switches: exam.track_window_switches ?? true,
                     });
 
                     // המרת שאלות לפורמט של העריכה
@@ -118,18 +133,18 @@ const EditExam = ({ user }: EditExamProps) => {
                         id: `q_${q.id}`,
                         question_text: q.question_text,
                         question_type: q.question_type,
+                        correct_answer: q.correct_answer,
                         points: q.points,
                         programming_language: q.programming_language,
                         initial_code: q.initial_code,
-                        expected_output: q.expected_output,
                         options: q.options ? q.options.map((opt: any) => ({
                             letter: opt.option_letter,
                             text: opt.option_text,
                             is_correct: opt.is_correct
                         })) : []
                     }));
-                    console.log(convertedQuestions);
-                    
+                    console.log("convertedQuestions", (convertedQuestions));
+
                     setQuestions(convertedQuestions);
                 } else {
                     setError(data.error || 'שגיאה בטעינת המבחן');
@@ -143,17 +158,13 @@ const EditExam = ({ user }: EditExamProps) => {
             setIsLoading(false);
         }
     };
-
     const handleCancel = () => {
         if (hasUnsavedChanges()) {
-            if (window.confirm('יש לך שינויים שלא נשמרו. האם אתה בטוח שברצונך לעזוב?')) {
-                navigate(`/teacher/exam/${examId}/view`);
-                window.history.back();
+            if (!window.confirm('יש לך שינויים שלא נשמרו. האם אתה בטוח שברצונך לעזוב?')) {
+                return; // לא עוזבים
             }
-        } else {
-            navigate(`/teacher/exam/${examId}/view`);
-            window.history.back();
         }
+        navigate(`/teacher/exam/${examId}/view`);
     };
 
     const hasUnsavedChanges = () => {
@@ -179,8 +190,10 @@ const EditExam = ({ user }: EditExamProps) => {
             return false;
         }
 
-        const invalidQuestions = questions.filter(q => !q.question_text.trim());
+        const invalidQuestions = questions.filter(q => !q.question_text.trim() || !q.correct_answer);
         if (invalidQuestions.length > 0) {
+            console.log(invalidQuestions);
+
             alert('יש שאלות ללא טקסט');
             return false;
         }
@@ -202,11 +215,11 @@ const EditExam = ({ user }: EditExamProps) => {
         // ולידציה לשאלות קוד
         const codeQuestions = questions.filter(q => q.question_type === 'code');
         const invalidCodeQuestions = codeQuestions.filter(q =>
-            !q.programming_language || !q.expected_output?.trim()
+            !q.programming_language || !q.correct_answer
         );
 
         if (invalidCodeQuestions.length > 0) {
-            alert('יש שאלות קוד חסרות שפת תכנות או פלט צפוי');
+            alert('יש שאלות קוד חסרות שפת תכנות או שחסר תיאור לתשובה נכונה');
             return false;
         }
 
@@ -220,6 +233,9 @@ const EditExam = ({ user }: EditExamProps) => {
         try {
             const examData = {
                 ...examDetails,
+                 // המר תאריכים לפורמט שרת
+                start_time: formatDateForServer(examDetails.start_time),
+                end_time: formatDateForServer(examDetails.end_time),
                 questions,
                 status: newStatus || originalData?.status
             };
@@ -278,7 +294,8 @@ const EditExam = ({ user }: EditExamProps) => {
     };
 
     const getTotalPoints = () => {
-        return questions.reduce((sum, q) => sum + q.points, 0);
+        console.log(questions);
+        return questions.reduce((sum, q) => sum + Number(q.points), 0);
     };
 
     if (isLoading) {

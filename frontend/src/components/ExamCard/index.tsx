@@ -105,7 +105,7 @@ const ExamCard = ({ exam, onCopyCode, onViewExam, onViewResults }: ExamCardProps
           </div>
         </div>
         <div className="stat-item submissions">
-          <div className="stat-label">הגשות</div>
+          <div className="stat-label">פתחו</div>
           <div className="stat-value submissions">
             {exam.total_submissions || 0}
           </div>

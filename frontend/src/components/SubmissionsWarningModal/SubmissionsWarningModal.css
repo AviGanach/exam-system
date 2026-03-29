@@ -1,0 +1,227 @@
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.warning-modal {
+    max-width: 550px;
+    border: 2px solid #fed7d7;
+}
+
+.warning-modal .modal-header {
+    background: linear-gradient(135deg, #fed7d7, #feb2b2);
+    border-bottom: 1px solid #fc8181;
+}
+
+.warning-modal .modal-header h3 {
+    color: #c53030;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    direction: rtl;
+    animation: warningModalSlideIn 0.3s ease-out;
+}
+
+@keyframes warningModalSlideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modal-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin: 0;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #a0aec0;
+    cursor: pointer;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    transition: all 0.2s;
+}
+
+.modal-close:hover {
+    background: #f7fafc;
+    color: #4a5568;
+}
+
+.warning-modal .modal-close:hover {
+    background: rgba(197, 48, 48, 0.1);
+    color: #c53030;
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-body p {
+    color: #4a5568;
+    margin: 0 0 2rem 0;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.warning-modal .modal-body p {
+    background: #fef5e7;
+    border: 1px solid #f6e05e;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    color: #744210;
+}
+
+.warning-modal .modal-body strong {
+    color: #c53030;
+    font-weight: 700;
+}
+
+.warning-options {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.warning-option-btn {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 0.75rem;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: right;
+}
+
+.warning-option-btn.export {
+    border-color: #4299e1;
+    background: #f7fafc;
+}
+
+.warning-option-btn.export:hover {
+    border-color: #3182ce;
+    background: #ebf8ff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(49, 130, 206, 0.15);
+}
+
+.warning-option-btn.delete {
+    border-color: #fc8181;
+    background: #fef5f5;
+}
+
+.warning-option-btn.delete:hover {
+    border-color: #e53e3e;
+    background: #fed7d7;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(229, 62, 62, 0.15);
+}
+
+.option-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.warning-option-btn.export .option-icon {
+    color: #3182ce;
+}
+
+.warning-option-btn.delete .option-icon {
+    color: #e53e3e;
+}
+
+.option-text {
+    flex: 1;
+}
+
+.option-text h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin: 0 0 0.25rem 0;
+}
+
+.warning-option-btn.export .option-text h4 {
+    color: #3182ce;
+}
+
+.warning-option-btn.delete .option-text h4 {
+    color: #e53e3e;
+}
+
+.option-text p {
+    font-size: 0.9rem;
+    color: #718096;
+    margin: 0;
+    line-height: 1.4;
+}
+
+@media (max-width: 480px) {
+    .modal-content {
+        margin: 1rem;
+        max-width: none;
+    }
+    
+    .modal-header {
+        padding: 1rem 1.5rem;
+    }
+    
+    .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .warning-option-btn {
+        padding: 1rem;
+        gap: 0.75rem;
+    }
+    
+    .option-icon {
+        font-size: 1.5rem;
+    }
+    
+    .warning-options {
+        gap: 0.75rem;
+    }
+}

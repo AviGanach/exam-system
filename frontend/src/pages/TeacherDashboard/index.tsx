@@ -68,6 +68,7 @@ const TeacherDashboard = ({ user }: TeacherDashboardProps) => {
     try {
       await navigator.clipboard.writeText(examCode);
       // TODO: Show success toast
+      alert('הקוד הועתק בהצלחה');
     } catch (err) {
       alert('שגיאה בהעתקת הקוד');
     }

@@ -24,3 +24,9 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Secrets (safety net)  ← הוסף כל הבלוק
+*.pem
+*.key
+*.env

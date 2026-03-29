@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import './ExamView.css';
 import { useNavigate, useParams } from 'react-router-dom';
+import EditExamModal from '../../components/EditExamModal';
+import SubmissionsWarningModal from '../../components/SubmissionsWarningModal';
+
 
 interface User {
     token: string;
@@ -19,10 +22,10 @@ interface Question {
     question_type: 'multiple_choice' | 'open_text' | 'code';
     points: number;
     question_order: number;
-    options?: { letter: string; text: string; is_correct: boolean }[];
+    options?: { option_letter: string; option_text: string; is_correct: boolean }[];
     programming_language?: string;
     initial_code?: string;
-    expected_output?: string;
+    correct_answer?: string;
 }
 
 interface Exam {
@@ -41,20 +44,32 @@ interface Exam {
     status: 'draft' | 'active' | 'closed';
     created_at: string;
     questions: Question[];
-    total_submissions?: number;
+}
+
+interface ExamSubmission {
+    completed: number;
+    in_progress: number;
+    abandoned: number;
 }
 
 const ExamView = ({ user }: ExamViewProps) => {
     const { examId } = useParams<{ examId: string }>();
-    console.log(examId);
-    
     const [exam, setExam] = useState<Exam | null>(null);
+    const [examSubmission, setExamSubmission] = useState<ExamSubmission>({
+        completed: 0,
+        in_progress: 0,
+        abandoned: 0
+    });
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState('');
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showSubmissionsWarning, setShowSubmissionsWarning] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchExam();
+        fetchExamSubmission();
     }, [examId]);
 
     const fetchExam = async () => {
@@ -81,16 +96,190 @@ const ExamView = ({ user }: ExamViewProps) => {
         }
     };
 
+    const fetchExamSubmission = async () => {
+        try {
+            setIsLoading(true);
+            const response = await fetch(`/api/teacher/exam/${examId}/submission`, {
+                headers: { 'Authorization': `Bearer ${user.token}` }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    setExamSubmission(data.submissions);
+                }
+            }
+        } catch (err) {
+            setError('Failed to fetch exam submission :' + err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     const handleBack = () => {
         navigate('/teacher/dashboard');
     };
 
     const handleEdit = () => {
-        navigate(`/teacher/exam/${examId}/edit`);
+        setShowEditModal(true);
+        // navigate(`/teacher/exam/${examId}/edit`);
+    };
+
+    const handleEditDetails = () => {
+        setShowEditModal(false);
+        navigate(`/teacher/exam/${examId}/edit_details`);
+    };
+
+    const handleEditContent = async () => {
+        setShowEditModal(false);
+
+        // בדיקה אם יש הגשות
+        const submission_count = examSubmission.completed + examSubmission.in_progress;
+        if (submission_count > 0) {
+            setShowSubmissionsWarning(true);
+        } else {
+            navigate(`/teacher/exam/${examId}/edit_content`);
+        }
+    };
+
+    const handleExportAndDelete = async () => {
+        try {
+            const response = await fetch(`/api/teacher/exam/${examId}/export_and_delete_submissions`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${user.token}` }
+            });
+
+            if (response.ok) {
+                // בדיקה אם יש קובץ להורדה
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('text/csv')) {
+                    // הורדת הקובץ
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+
+                    // שם קובץ דינמי
+                    const contentDisposition = response.headers.get('content-disposition');
+                    let fileName = `exam_${examId}_submissions.csv`;
+                    if (contentDisposition) {
+                        const fileNameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+                        if (fileNameMatch && fileNameMatch[1]) {
+                            fileName = fileNameMatch[1].replace(/['"]/g, '');
+                        }
+                    }
+
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+
+                    alert('ההגשות יוצאו והורדו בהצלחה! ההגשות נמחקו מהמערכת.');
+                    setShowSubmissionsWarning(false);
+
+                    // רענן את סטטיסטיקות ההגשות
+                    fetchExamSubmission();
+                } else {
+                    // אין קובץ - רק מחיקה (אם לא היו הגשות)
+                    const data = await response.json();
+                    alert(data.message || 'ההגשות נמחקו (לא היו הגשות לייצוא)');
+                    setShowSubmissionsWarning(false);
+                    fetchExamSubmission();
+                }
+            } else {
+                const data = await response.json();
+                alert('שגיאה: ' + (data.error || 'לא ידוע'));
+            }
+        } catch (error) {
+            alert('שגיאה בייצוא ומחיקת הגשות');
+            console.error('Export error:', error);
+        }
+    };
+
+    const handleDeleteOnly = async () => {
+        if (!window.confirm('האם אתה בטוח שברצונך למחוק את כל ההגשות והתשובות למבחן זה ללא ייצוא?')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/teacher/exam/${examId}/delete_submissions`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${user.token}` }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                alert('ההגשות והתשובות למבחן זה נמחקו בהצלחה');
+                setShowSubmissionsWarning(false);
+                navigate(`/teacher/exam/${examId}/edit_content`);
+            } else {
+                alert('שגיאה במחיקת הגשות');
+            }
+        } catch (error) {
+            alert('שגיאה במחיקת הגשות');
+        }
     };
 
     const handleResults = () => {
         navigate(`/teacher/exam/${examId}/results`);
+    };
+
+    const handleDelete = async () => {
+        if (!exam) return;
+
+        const confirmMessage = examSubmission && examSubmission.completed + examSubmission.in_progress > 0
+            ? `למבחן זה יש ${examSubmission.completed} הגשות מושלמות${examSubmission.in_progress > 0 ? ` ו-${examSubmission.in_progress} הגשות בתהליך` : ''}. האם אתה בטוח שברצונך למחוק את המבחן לצמיתות?`
+            : 'האם אתה בטוח שברצונך למחוק את המבחן לצמיתות?';
+
+        if (!window.confirm(confirmMessage)) {
+            return;
+        }
+
+        setIsDeleting(true);
+        try {
+            const forceDelete = examSubmission && examSubmission.completed + examSubmission.in_progress > 0;
+            const response = await fetch(`/api/teacher/exam/${examId}/delete?force=${forceDelete}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${user.token}` }
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                alert('המבחן נמחק בהצלחה');
+                navigate('/teacher/dashboard');
+            } else if (data.requires_confirmation) {
+                const forceConfirm = window.confirm(
+                    `למבחן זה יש ${data.submission_count} הגשות. האם אתה בטוח שברצונך למחוק את המבחן יחד עם כל ההגשות?`
+                );
+
+                if (forceConfirm) {
+                    // ביצוע מחיקה כפויה
+                    const forceResponse = await fetch(`/api/teacher/exam/${examId}/delete?force=true`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${user.token}` }
+                    });
+
+                    const forceData = await forceResponse.json();
+                    if (forceResponse.ok && forceData.success) {
+                        alert('המבחן נמחק בהצלחה');
+                        navigate('/teacher/dashboard');
+                    } else {
+                        alert('שגיאה במחיקת המבחן: ' + (forceData.error || 'שגיאה לא ידועה'));
+                    }
+                }
+            } else {
+                alert('שגיאה במחיקת המבחן: ' + (data.error || 'שגיאה לא ידועה'));
+            }
+        } catch (err) {
+            alert('שגיאה בחיבור לשרת');
+            console.error('Delete error:', err);
+        } finally {
+            setIsDeleting(false);
+        }
     };
 
     const copyExamCode = async () => {
@@ -213,6 +402,13 @@ const ExamView = ({ user }: ExamViewProps) => {
                             <button onClick={handleResults} className="action-btn btn-results">
                                 תוצאות
                             </button>
+                            <button
+                                onClick={handleDelete}
+                                className="action-btn btn-delete"
+                                disabled={isDeleting}
+                            >
+                                {isDeleting ? 'מוחק...' : 'מחיקה'}
+                            </button>
                         </div>
                     </div>
                 </header>
@@ -267,13 +463,14 @@ const ExamView = ({ user }: ExamViewProps) => {
 
                                         {question.question_type === 'multiple_choice' && question.options && (
                                             <div className="question-options">
+
                                                 {question.options.map((option) => (
                                                     <div
-                                                        key={option.letter}
-                                                        className={`option-item ${option.is_correct ? 'option-correct' : ''}`}
+                                                        key={option.option_letter}
+                                                        className={`view-option-item ${option.is_correct ? 'option-correct' : 'option-wrong'}`}
                                                     >
-                                                        {option.letter}. {option.text}
-                                                        {option.is_correct && ' ✓'}
+                                                        {option.option_letter}. {option.option_text}
+                                                        {option.is_correct ? ' ✓' : ' ✗'}
                                                     </div>
                                                 ))}
                                             </div>
@@ -292,12 +489,18 @@ const ExamView = ({ user }: ExamViewProps) => {
                                                     </div>
                                                 )}
 
-                                                {question.expected_output && (
+                                                {question.correct_answer && (
                                                     <div className="code-block">
                                                         <div className="code-label">פלט צפוי:</div>
-                                                        <div className="code-content">{question.expected_output}</div>
+                                                        <div className="code-content">{question.correct_answer}</div>
                                                     </div>
                                                 )}
+                                            </div>
+                                        )}
+                                        {question.question_type === 'open_text' && question.correct_answer && (
+                                            <div className="open-text-answer">
+                                                <div className="answer-label">תשובה נכונה:</div>
+                                                <div className="answer-content">{question.correct_answer}</div>
                                             </div>
                                         )}
                                     </div>
@@ -317,7 +520,11 @@ const ExamView = ({ user }: ExamViewProps) => {
                             </div>
                             <div className="stat-item">
                                 <span className="stat-label">הגשות:</span>
-                                <span className="stat-value">{exam.total_submissions || 0}</span>
+                                <span className="stat-value">{examSubmission.completed || 0}</span>
+                                <span className="stat-label">בתהליך:</span>
+                                <span className="stat-value">{examSubmission.in_progress || 0}</span>
+                                <span className="stat-label">נטושות:</span>
+                                <span className="stat-value">{examSubmission.abandoned || 0}</span>
                             </div>
                             <div className="stat-item">
                                 <span className="stat-label">נוצר:</span>
@@ -360,6 +567,20 @@ const ExamView = ({ user }: ExamViewProps) => {
                     </aside>
                 </div>
             </div>
+            <EditExamModal
+                isOpen={showEditModal}
+                onClose={() => setShowEditModal(false)}
+                onEditDetails={handleEditDetails}
+                onEditContent={handleEditContent}
+            />
+
+            <SubmissionsWarningModal
+                isOpen={showSubmissionsWarning}
+                onClose={() => setShowSubmissionsWarning(false)}
+                submissionCount={examSubmission.completed + examSubmission.in_progress}
+                onExportAndDelete={handleExportAndDelete}
+                onDeleteOnly={handleDeleteOnly}
+            />
         </div>
     );
 };

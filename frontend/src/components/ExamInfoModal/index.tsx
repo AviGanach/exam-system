@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import './ExamInfoModal.css';
 
 interface ExamInfoModalProps {
@@ -8,8 +9,11 @@ interface ExamInfoModalProps {
 }
 
 const ExamInfoModal = ({ examInfo, examCode, onClose, onBack }: ExamInfoModalProps) => {
+  
+  const navigate = useNavigate()
+
   const handleRegister = () => {
-    // מעבר לדף רישום - נממש בהמשך
+    navigate(`/student/exam/${examCode}/register`);
     console.log('Navigate to registration for exam:', examCode);
   };
 

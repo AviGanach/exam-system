@@ -1,0 +1,75 @@
+.exam-register-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.exam-register-container {
+  max-width: 400px;
+  margin: 50px auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  direction: rtl;
+}
+
+.exam-register-h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.exam-register-form-group {
+  margin-bottom: 15px;
+}
+
+.exam-register-label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+.exam-register-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.exam-register-input:focus {
+  border-color: #1976d2;
+  outline: none;
+  box-shadow: 0 0 3px rgba(25, 118, 210, 0.4);
+}
+
+.exam-register-send-btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: 0.3s;
+  background-color: #1976d2;
+  color: white;
+}
+
+.exam-register-send-btn:hover {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: 0.3s;
+  background-color: #125ea2;
+}
+
+.exam-register-message {
+  margin-top: 10px;
+  text-align: center;
+  color: #333;
+}

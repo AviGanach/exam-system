@@ -5,8 +5,8 @@ interface ExamDetails {
   description: string;
   duration_minutes: number;
   passing_grade: number;
-  start_time: string;
-  end_time: string;
+  start_time: string; // YYYY-MM-DDTHH:mm | ''
+  end_time: string;   // YYYY-MM-DDTHH:mm | ''
   show_timer: boolean;
   show_grade_immediately: boolean;
   track_window_switches: boolean;
@@ -18,149 +18,177 @@ interface ExamDetailsFormProps {
 }
 
 const ExamDetailsForm = ({ examDetails, setExamDetails }: ExamDetailsFormProps) => {
-  const handleInputChange = (field: keyof ExamDetails, value: string | number | boolean) => {
+
+  const handleInputChange = (
+    field: keyof ExamDetails,
+    value: string | number | boolean
+  ) => {
     setExamDetails(prev => ({
       ...prev,
       [field]: value
     }));
   };
 
-  const handleNumberInput = (field: keyof ExamDetails, value: string) => {
-    const numValue = parseInt(value) || 0;
+  const handleNumberInput = (
+    field: keyof ExamDetails,
+    value: string
+  ) => {
+    const numValue = value === '' ? 0 : parseInt(value, 10);
     handleInputChange(field, numValue);
   };
 
-  const formatDateTimeForInput = (dateStr: string) => {
-    if (!dateStr) return '';
-    const date = new Date(dateStr);
-    return date.toISOString().slice(0, 16);
-  };
-
-  const handleDateTimeChange = (field: keyof ExamDetails, value: string) => {
+  const handleDateTimeChange = (
+    field: keyof ExamDetails,
+    value: string
+  ) => {
+    // value כבר בפורמט תקין של datetime-local
     handleInputChange(field, value);
   };
 
   return (
-    <div>
-      <h2 className="section-title">פרטי המבחן</h2>
-      
-      <div className="form-group">
-        <label className="form-label">כותרת המבחן *</label>
+    <div className="edf-container">
+      <h2 className="edf-section-title">פרטי המבחן</h2>
+
+      {/* כותרת */}
+      <div className="edf-form-group">
+        <label className="edf-form-label">כותרת המבחן *</label>
         <input
           type="text"
-          className="form-input"
+          className="edf-form-input"
           value={examDetails.title}
-          onChange={(e) => handleInputChange('title', e.target.value)}
+          onChange={(e) =>
+            handleInputChange('title', e.target.value)
+          }
           placeholder="הזן כותרת למבחן"
           maxLength={255}
         />
       </div>
 
-      <div className="form-group">
-        <label className="form-label">תיאור המבחן</label>
+      {/* תיאור */}
+      <div className="edf-form-group">
+        <label className="edf-form-label">תיאור המבחן</label>
         <textarea
-          className="form-input form-textarea"
+          className="edf-form-input edf-form-textarea"
           value={examDetails.description}
-          onChange={(e) => handleInputChange('description', e.target.value)}
+          onChange={(e) =>
+            handleInputChange('description', e.target.value)
+          }
           placeholder="תיאור קצר של המבחן (אופציונלי)"
           maxLength={1000}
         />
       </div>
 
-      <div className="form-group">
-        <div className="form-grid-2">
+      {/* משך וציון עובר */}
+      <div className="edf-form-group">
+        <div className="edf-form-grid-2">
           <div>
-            <label className="form-label">משך המבחן (דקות) *</label>
+            <label className="edf-form-label">משך המבחן (דקות) *</label>
             <input
               type="number"
-              className="form-input"
+              className="edf-form-input"
               value={examDetails.duration_minutes}
-              onChange={(e) => handleNumberInput('duration_minutes', e.target.value)}
-              min="1"
-              max="600"
-              placeholder="60"
+              onChange={(e) =>
+                handleNumberInput('duration_minutes', e.target.value)
+              }
+              min={1}
+              max={600}
             />
           </div>
+
           <div>
-            <label className="form-label">ציון עובר *</label>
+            <label className="edf-form-label">ציון עובר *</label>
             <input
               type="number"
-              className="form-input"
+              className="edf-form-input"
               value={examDetails.passing_grade}
-              onChange={(e) => handleNumberInput('passing_grade', e.target.value)}
-              min="0"
-              max="100"
-              placeholder="60"
+              onChange={(e) =>
+                handleNumberInput('passing_grade', e.target.value)
+              }
+              min={0}
+              max={100}
             />
           </div>
         </div>
       </div>
 
-      <div className="form-group">
-        <div className="form-grid-2">
+      {/* זמני פתיחה / סגירה */}
+      <div className="edf-form-group">
+        <div className="edf-form-grid-2">
           <div>
-            <label className="form-label">זמן פתיחה</label>
+            <label className="edf-form-label">זמן פתיחה</label>
             <input
               type="datetime-local"
-              className="form-input"
-              value={formatDateTimeForInput(examDetails.start_time)}
-              onChange={(e) => handleDateTimeChange('start_time', e.target.value)}
+              className="edf-form-input"
+              value={examDetails.start_time || ''}
+              onChange={(e) =>
+                handleDateTimeChange('start_time', e.target.value)
+              }
             />
-            <div className="form-help-text">
+            <div className="edf-form-help-text">
               השאר ריק למבחן ללא הגבלת זמן
             </div>
           </div>
+
           <div>
-            <label className="form-label">זמן סגירה</label>
+            <label className="edf-form-label">זמן סגירה</label>
             <input
               type="datetime-local"
-              className="form-input"
-              value={formatDateTimeForInput(examDetails.end_time)}
-              onChange={(e) => handleDateTimeChange('end_time', e.target.value)}
+              className="edf-form-input"
+              value={examDetails.end_time || ''}
+              onChange={(e) =>
+                handleDateTimeChange('end_time', e.target.value)
+              }
             />
-            <div className="form-help-text">
+            <div className="edf-form-help-text">
               השאר ריק למבחן ללא הגבלת זמן
             </div>
           </div>
         </div>
       </div>
 
-      <div className="advanced-settings">
+      {/* הגדרות מתקדמות */}
+      <div className="edf-advanced-settings">
         <h3>הגדרות מתקדמות</h3>
-        
-        <div className="form-checkbox">
+
+        <div className="edf-form-checkbox">
           <input
             type="checkbox"
             id="show_timer"
             checked={examDetails.show_timer}
-            onChange={(e) => handleInputChange('show_timer', e.target.checked)}
+            onChange={(e) =>
+              handleInputChange('show_timer', e.target.checked)
+            }
           />
           <label htmlFor="show_timer">
             הצג טיימר לתלמידים במהלך המבחן
           </label>
         </div>
 
-        <div className="form-checkbox">
+        <div className="edf-form-checkbox">
           <input
             type="checkbox"
             id="show_grade_immediately"
             checked={examDetails.show_grade_immediately}
-            onChange={(e) => handleInputChange('show_grade_immediately', e.target.checked)}
+            onChange={(e) =>
+              handleInputChange('show_grade_immediately', e.target.checked)
+            }
           />
           <label htmlFor="show_grade_immediately">
             הצג ציון מיד בסיום המבחן
           </label>
         </div>
 
-        <div className="form-checkbox">
+        <div className="edf-form-checkbox">
           <input
             type="checkbox"
             id="track_window_switches"
             checked={examDetails.track_window_switches}
-            onChange={(e) => handleInputChange('track_window_switches', e.target.checked)}
+            onChange={(e) =>
+              handleInputChange('track_window_switches', e.target.checked)
+            }
           />
           <label htmlFor="track_window_switches">
-            מעקב אחר מעבר בין חלונות/טאבים
+            מעקב אחר מעבר בין חלונות / טאבים
           </label>
         </div>
       </div>
