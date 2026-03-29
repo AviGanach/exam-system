@@ -16,7 +16,7 @@ from app.routes.teacher import teacher_bp
 load_dotenv()
 app = Flask(__name__)
 # הגדרות CORS
-CORS(app, origins=['http://localhost:3000'])  # הגבל לFrontend בלבד
+CORS(app, origins='*')
 
 # הגדרות JWT
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
