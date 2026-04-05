@@ -1,5 +1,4 @@
-// components/EditExamModal.tsx
-import React, { useState } from 'react';
+import React from 'react';
 import './EditExamModal.css';
 
 interface EditExamModalProps {

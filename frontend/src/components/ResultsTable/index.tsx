@@ -43,6 +43,7 @@ const ResultsTable: React.FC<ResultsTableProps> = ({ examId, user }) => {
 
     useEffect(() => {
         fetchExamResults();
+    // eslint-disable-next-line react-hooks/exhaustive-deps    
     }, [examId]);
 
     const fetchExamResults = async () => {

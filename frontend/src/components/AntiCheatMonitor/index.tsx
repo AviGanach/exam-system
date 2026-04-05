@@ -71,6 +71,7 @@ const AntiCheatMonitor: React.FC<AntiCheatMonitorProps> = ({
         return () => {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isActive, onSuspiciousActivity, showWarnings]);        // עדכון הלוג עם משך הזמן
 
     // התרעות למשתמש על פעילות חשודה
@@ -87,6 +88,7 @@ const AntiCheatMonitor: React.FC<AntiCheatMonitorProps> = ({
 
             setLastWarningCount(switchCount);
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps    
     }, [switchCount, lastWarningCount, showWarnings]);
 
     // רישום פעילות

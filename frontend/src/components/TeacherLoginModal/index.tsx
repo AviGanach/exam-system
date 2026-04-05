@@ -23,7 +23,7 @@ const TeacherLoginModal = ({ onClose, setUser }: TeacherLoginModalProps) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    if (email != email2) {
+    if (email !== email2) {
       alert('האימיילים אינם תואמים');
       setIsLoading(false);
       setEmail('');

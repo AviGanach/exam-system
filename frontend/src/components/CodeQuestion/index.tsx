@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import MonacoEditor, { OnMount } from '@monaco-editor/react';
 import API_URL from '../../config';
 import './CodeQuestion.css';
@@ -32,6 +32,7 @@ export default function CodeQuestion({ initial_code , readOnly = false, onChange
     if (initial_code !== code) {
       setCode(initial_code);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initial_code]);
 
   const handleEditorMount: OnMount = (editor, monaco) => {
@@ -67,6 +68,7 @@ useEffect(() => {
     window.removeEventListener('resize', handleResize);
     clearTimeout(timer);
   };
+// eslint-disable-next-line react-hooks/exhaustive-deps  
 }, []);
 
 // וודא פריסה כאשר השפה משתנה
@@ -74,6 +76,7 @@ useEffect(() => {
   if (editorRef.current) {
     setTimeout(() => editorRef.current.layout(), 50);
   }
+// eslint-disable-next-line react-hooks/exhaustive-deps  
 }, [language]);
 
 
