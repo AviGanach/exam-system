@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import './ExamView.css';
 import { useNavigate, useParams } from 'react-router-dom';
 import EditExamModal from '../../components/EditExamModal';
 import SubmissionsWarningModal from '../../components/SubmissionsWarningModal';
+import API_URL from '../../config';
+import './ExamView.css';
 
 
 interface User {
@@ -75,7 +76,7 @@ const ExamView = ({ user }: ExamViewProps) => {
     const fetchExam = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch(`/api/teacher/exam/${examId}/view`, {
+            const response = await fetch(`${API_URL}/api/teacher/exam/${examId}/view`, {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
 
@@ -99,7 +100,7 @@ const ExamView = ({ user }: ExamViewProps) => {
     const fetchExamSubmission = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch(`/api/teacher/exam/${examId}/submission`, {
+            const response = await fetch(`${API_URL}/api/teacher/exam/${examId}/submission`, {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
 
@@ -144,7 +145,7 @@ const ExamView = ({ user }: ExamViewProps) => {
 
     const handleExportAndDelete = async () => {
         try {
-            const response = await fetch(`/api/teacher/exam/${examId}/export_and_delete_submissions`, {
+            const response = await fetch(`${API_URL}/api/teacher/exam/${examId}/export_and_delete_submissions`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
@@ -204,7 +205,7 @@ const ExamView = ({ user }: ExamViewProps) => {
         }
 
         try {
-            const response = await fetch(`/api/teacher/exam/${examId}/delete_submissions`, {
+            const response = await fetch(`${API_URL}/api/teacher/exam/${examId}/delete_submissions`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
@@ -241,7 +242,7 @@ const ExamView = ({ user }: ExamViewProps) => {
         setIsDeleting(true);
         try {
             const forceDelete = examSubmission && examSubmission.completed + examSubmission.in_progress > 0;
-            const response = await fetch(`/api/teacher/exam/${examId}/delete?force=${forceDelete}`, {
+            const response = await fetch(`${API_URL}/api/teacher/exam/${examId}/delete?force=${forceDelete}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
@@ -258,7 +259,7 @@ const ExamView = ({ user }: ExamViewProps) => {
 
                 if (forceConfirm) {
                     // ביצוע מחיקה כפויה
-                    const forceResponse = await fetch(`/api/teacher/exam/${examId}/delete?force=true`, {
+                    const forceResponse = await fetch(`${API_URL}/api/teacher/exam/${examId}/delete?force=true`, {
                         method: 'DELETE',
                         headers: { 'Authorization': `Bearer ${user.token}` }
                     });

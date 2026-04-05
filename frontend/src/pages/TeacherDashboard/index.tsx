@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import ExamCard from '../../components/ExamCard';
+import API_URL from '../../config'; 
 import './TeacherDashboard.css';
 
 interface User {
@@ -41,7 +42,7 @@ const TeacherDashboard = ({ user }: TeacherDashboardProps) => {
   const fetchExams = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/teacher/exams', {
+      const response = await fetch(`${API_URL}/api/teacher/exams`, {
         headers: { 'Authorization': `Bearer ${user.token}` }
       });
 

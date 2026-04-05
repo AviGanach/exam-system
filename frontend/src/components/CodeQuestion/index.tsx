@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import MonacoEditor, { OnMount } from '@monaco-editor/react';
+import API_URL from '../../config';
 import './CodeQuestion.css';
 
 
@@ -81,7 +82,7 @@ useEffect(() => {
     setOutput('מריץ קוד...');
 
     try {
-      const response = await fetch('/api/student/run_code', {
+      const response = await fetch(`${API_URL}/api/student/run_code`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

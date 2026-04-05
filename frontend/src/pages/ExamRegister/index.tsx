@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import API_URL from '../../config';
 import './ExamRegister.css';
 
 interface ExamRegisterProps {
@@ -23,7 +24,7 @@ const ExamRegister = ({ setUser }: ExamRegisterProps) => {
     console.log(examCode,fullName,email,idNumber);
     
     try {
-      const response = await fetch(`/api/student/register/${examCode}`, {
+      const response = await fetch(`${API_URL}/api/student/register/${examCode}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: fullName, id_number:idNumber, email }),

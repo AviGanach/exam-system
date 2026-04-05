@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import ExamDetailsForm from '../../components/ExamDetailsForm';
 import QuestionsList from '../../components/QuestionsList';
 import ExamSidebar from '../../components/ExamSidebar';
+import API_URL from '../../config';
 import './EditExam.css';
-import { useNavigate, useParams } from 'react-router-dom';
 
 interface User {
     token: string;
@@ -100,7 +101,7 @@ const EditExam = ({ user }: EditExamProps) => {
     const fetchExam = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch(`/api/teacher/exam/${examId}/view`, {
+            const response = await fetch(`${API_URL}/api/teacher/exam/${examId}/view`, {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
 
@@ -240,7 +241,7 @@ const EditExam = ({ user }: EditExamProps) => {
                 status: newStatus || originalData?.status
             };
 
-            const response = await fetch(`/api/teacher/exam/${examId}/update`, {
+            const response = await fetch(`${API_URL}/api/teacher/exam/${examId}/update`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import API_URL from '../../config';
 import './EditExamDetails.css';
 
 interface User {
@@ -80,7 +81,7 @@ const EditExamDetails = ({ user }: UpdateExamDetailsProps) => {
     const fetchExamDetails = async () => {
         try {
             setIsLoading(true);
-            const response = await fetch(`/api/teacher/exam/${examId}/view`, {
+            const response = await fetch(`${API_URL}/api/teacher/exam/${examId}/view`, {
                 headers: { 'Authorization': `Bearer ${user.token}` }
             });
 
@@ -164,7 +165,7 @@ const EditExamDetails = ({ user }: UpdateExamDetailsProps) => {
             };
             console.log('Data being sent:', dataToSend); // ← debug לבדיקה
 
-            const response = await fetch(`/api/teacher/exam/${examId}/update_details`, {
+            const response = await fetch(`${API_URL}/api/teacher/exam/${examId}/update_details`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

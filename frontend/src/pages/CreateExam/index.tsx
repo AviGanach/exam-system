@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ExamDetailsForm from '../../components/ExamDetailsForm';
 import QuestionsList from '../../components/QuestionsList';
 import ExamSidebar from '../../components/ExamSidebar';
+import API_URL from '../../config';
 import './CreateExam.css';
 
 interface User {
@@ -129,7 +130,7 @@ const CreateExam = ({ user }: CreateExamProps) => {
       };
 
       console.log(examData);
-      const response = await fetch('/api/teacher/create-exam', {
+      const response = await fetch(`${API_URL}/api/teacher/create-exam`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

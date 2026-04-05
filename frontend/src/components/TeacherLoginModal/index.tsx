@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import AdminVerificationModal from '../AdminVerificationModal';
+import API_URL from '../../config';
 import './TeacherLoginModal.css';
 
 interface TeacherLoginModalProps {
@@ -31,7 +31,7 @@ const TeacherLoginModal = ({ onClose, setUser }: TeacherLoginModalProps) => {
       return;
     }
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password })
@@ -65,7 +65,7 @@ const TeacherLoginModal = ({ onClose, setUser }: TeacherLoginModalProps) => {
 
   const handleAdminVerification = async (code: string) => {
     try {
-      const response = await fetch('/api/auth/verify-admin', {
+      const response = await fetch(`${API_URL}/api/auth/verify-admin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code })
