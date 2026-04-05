@@ -41,6 +41,7 @@ const EditExamContent = ({ user }: EditExamContentProps) => {
 
     useEffect(() => {
         fetchExamContent();
+    // eslint-disable-next-line react-hooks/exhaustive-deps    
     }, [examId]);
 
     const fetchExamContent = async () => {
@@ -82,7 +83,6 @@ const EditExamContent = ({ user }: EditExamContentProps) => {
             } else {
                 if (response.status === 409) {
                     // מבחן עם הגשות
-                    const data = await response.json();
                     alert('לא ניתן לערוך תוכן מבחן שיש לו הגשות');
                     navigate(`/teacher/exam/${examId}/view`);
                     return;

@@ -37,6 +37,7 @@ const TeacherDashboard = ({ user }: TeacherDashboardProps) => {
 
   useEffect(() => {
     fetchExams();
+  // eslint-disable-next-line react-hooks/exhaustive-deps  
   }, []);
 
   const fetchExams = async () => {

@@ -71,6 +71,7 @@ const ExamView = ({ user }: ExamViewProps) => {
     useEffect(() => {
         fetchExam();
         fetchExamSubmission();
+    // eslint-disable-next-line react-hooks/exhaustive-deps    
     }, [examId]);
 
     const fetchExam = async () => {

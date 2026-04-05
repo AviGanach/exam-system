@@ -52,6 +52,7 @@ const EditExamDetails = ({ user }: UpdateExamDetailsProps) => {
 
     useEffect(() => {
         fetchExamDetails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps    
     }, [examId]);
 
     const formatDateForInput = (dateString: string | null): string => {
