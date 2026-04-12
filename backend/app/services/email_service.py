@@ -37,7 +37,7 @@ class EmailService:
             message.attach(html_part)
 
             context = ssl.create_default_context()
-            with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
+            with smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=10) as server:
                 server.starttls(context=context)
                 server.login(self.sender_email, self.sender_password)
                 server.sendmail(self.sender_email, to_email, message.as_string())
