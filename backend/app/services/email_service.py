@@ -1,21 +1,17 @@
 import logging
 import os
-import smtplib
-import ssl
+import resend
 from dotenv import load_dotenv
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 
 load_dotenv()
 logger = logging.getLogger(__name__)
 
+resend.api_key = os.getenv('RESEND_API_KEY')
+
 
 class EmailService:
     def __init__(self):
-        self.smtp_server = os.getenv('SMTP_SERVER', 'smtp.gmail.com')
-        self.smtp_port = int(os.getenv('SMTP_PORT', 587))
-        self.sender_email = os.getenv('EMAIL_SENDER')
-        self.sender_password = os.getenv('EMAIL_PASSWORD')
+        self.sender_email = "onboarding@resend.dev"  # דומיין ברירת מחדל של Resend
 
     def _send_email(self, to_email, subject, html_content, text_content=None):
         """שולח מייל גנרי"""
@@ -23,26 +19,19 @@ class EmailService:
             return {'success': False, 'error': 'Missing required fields'}
 
         try:
-            message = MIMEMultipart("alternative")
-            message["Subject"] = subject
-            message["From"] = self.sender_email
-            message["To"] = to_email
-
-
+            params = {
+                "from": self.sender_email,
+                "to": [to_email],
+                "subject": subject,
+                "html": html_content,
+            }
             if text_content:
-                text_part = MIMEText(text_content, "plain", "utf-8")
-                message.attach(text_part)
+                params["text"] = text_content
 
-            html_part = MIMEText(html_content, "html", "utf-8")
-            message.attach(html_part)
-
-            context = ssl.create_default_context()
-            with smtplib.SMTP(self.smtp_server, self.smtp_port, timeout=10) as server:
-                server.starttls(context=context)
-                server.login(self.sender_email, self.sender_password)
-                server.sendmail(self.sender_email, to_email, message.as_string())
-
+            response = resend.Emails.send(params)
+            logger.info(f"מייל נשלח בהצלחה: {response}")
             return {'success': True, 'message': 'Email sent successfully'}
+
         except Exception as e:
             logger.error(f"שגיאה בשליחת מייל: {e}")
             return {'success': False, 'error': str(e)}
