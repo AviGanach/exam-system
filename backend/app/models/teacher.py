@@ -105,7 +105,7 @@ def get_exam_with_questions_for_teacher(exam_id: int, teacher_id: int) -> Option
             cursor.execute("""
                 SELECT id, title, exam_code, description, duration_minutes, 
                        passing_grade, start_time, end_time, show_timer, 
-                       show_grade_immediately, track_window_switches, 
+                       show_grade_immediately,show_review_after_exam, track_window_switches, 
                        max_score, status, created_at,
                        (SELECT COUNT(*) FROM exam_submissions WHERE exam_id = %s) as total_submissions
                 FROM exams 

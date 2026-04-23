@@ -116,7 +116,7 @@ def update_details(exam_id:int):
         data = request.get_json()
         if not data:
             return jsonify({'error': 'No data provided'}), 400
-
+        print(9999,data)
         # עדכון רק פרטי המבחן, לא השאלות
         result = update_exam_details_service(exam_id, teacher_id, data)
 

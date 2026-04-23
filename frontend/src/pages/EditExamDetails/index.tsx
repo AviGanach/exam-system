@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import API_URL from '../../config';
 import './EditExamDetails.css';
+import { log } from 'console';
 
 interface User {
     token: string;
@@ -24,6 +25,7 @@ interface ExamDetails {
     end_time: string | null;
     show_timer: boolean;
     show_grade_immediately: boolean;
+    show_review_after_exam: boolean;
     track_window_switches: boolean;
     status: string;
 }
@@ -45,6 +47,7 @@ const EditExamDetails = ({ user }: UpdateExamDetailsProps) => {
         end_time: null,
         show_timer: true,
         show_grade_immediately: false,
+        show_review_after_exam: false,
         track_window_switches: true,
         status: 'draft'
     });
@@ -90,7 +93,7 @@ const EditExamDetails = ({ user }: UpdateExamDetailsProps) => {
                 const data = await response.json();
                 if (data.success) {
                     const exam = data.exam;
-
+                    console.log("from server",exam);
                     const details = {
                         title: exam.title || '',
                         description: exam.description || '',
@@ -100,6 +103,7 @@ const EditExamDetails = ({ user }: UpdateExamDetailsProps) => {
                         end_time: exam.end_time ? formatDateForInput(exam.end_time) : null,
                         show_timer: exam.show_timer ?? true,
                         show_grade_immediately: exam.show_grade_immediately ?? false,
+                        show_review_after_exam: exam.show_review_after_exam ?? false,
                         track_window_switches: exam.track_window_switches ?? true,
                         status: exam.status || 'draft'
                     };
@@ -359,6 +363,16 @@ const EditExamDetails = ({ user }: UpdateExamDetailsProps) => {
                                 />
                                 <span className="checkmark"></span>
                                 הצג ציון מיד לאחר הגשה
+                            </label>
+                            
+                            <label className="checkbox-label">
+                                <input
+                                    type="checkbox"
+                                    checked={examDetails.show_review_after_exam}
+                                    onChange={(e) => setExamDetails({ ...examDetails, show_review_after_exam: e.target.checked })}
+                                />
+                                <span className="checkmark"></span>
+                                הצג מבחן עם פתרונות מיד לאחר הגשה
                             </label>
 
                             <label className="checkbox-label">

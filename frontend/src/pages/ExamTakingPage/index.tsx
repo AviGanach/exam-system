@@ -238,6 +238,14 @@ const ExamTakingPage: React.FC<ExamTakingPageProps> = ({ user }) => {
       } else {
         alert('✅ המבחן נשלח בהצלחה! הציון יהיה זמין אצל המורה.');
       }
+      console.log(data.show_review_after_exam);
+      
+      if (data.show_review_after_exam) {
+        console.log("SHOW",data.show_review_after_exam);
+        
+        // navigate('../ExamReview')
+      }
+
     } catch (err: any) {
       setIsSubmitting(false);
       setShowExplosion(false);
@@ -245,7 +253,7 @@ const ExamTakingPage: React.FC<ExamTakingPageProps> = ({ user }) => {
       alert('❌ שגיאה בשליחה: ' + err.message);
     }
     // בסיום המבחן חזור לדף הבית
-    navigate('/');
+    // navigate('/');
   };
 
   if (loading) return <div className="exam-loading">טוען מבחן...</div>;

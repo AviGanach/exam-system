@@ -6,7 +6,8 @@ from typing import Dict, Any
 from datetime import datetime
 
 
-from app.models.exam import create_exam_in_db, update_exam_details_db, update_exam_max_score, get_exam_info_by_code, is_exam_available, get_exam, get_exam_has_show_grade_and_passing_grade
+from app.models.exam import create_exam_in_db, update_exam_details_db, update_exam_max_score, get_exam_info_by_code, \
+    is_exam_available, get_exam, get_exam_completion_settings
 from app.models.exam_submission import start_exam_submission, finalize_submission, check_exam_has_submissions
 from app.models.student_answer import insert_student_answer
 from app.models.question import get_question_by_id, update_questions_in_db
@@ -87,6 +88,7 @@ def create_exam_service(teacher_id: int, exam_data: Dict[str, Any]) -> Dict[str,
             'end_time': exam_data.get('end_time') if exam_data.get('end_time') else None,
             'show_timer': exam_data.get('show_timer', True),
             'show_grade_immediately': exam_data.get('show_grade_immediately', False),
+            'show_review_after_exam': exam_data.get('show_review_after_exam', False),
             'track_window_switches': exam_data.get('track_window_switches', True),
             'status': exam_data.get('status', 'draft'),
             'max_score': sum(q.get('points', 1) for q in exam_data['questions'])
@@ -129,6 +131,7 @@ def update_exam_details_service(exam_id: int, teacher_id: int, exam_data: Dict[s
             'end_time': exam_data.get('end_time'),
             'show_timer': exam_data.get('show_timer', True),
             'show_grade_immediately': exam_data.get('show_grade_immediately', False),
+            'show_review_after_exam': exam_data.get('show_review_after_exam', False),
             'track_window_switches': exam_data.get('track_window_switches', True),
             'status': exam_data.get('status', 'draft'),
             'max_score': exam_data.get('max_score', 0)
@@ -227,6 +230,7 @@ def get_exam_service(student_id: int, exam_id: int) -> Dict[str, Any]:
                 'description': exam_data['description'],
                 'duration_minutes': exam_data['duration_minutes'],
                 'show_timer': exam_data['show_timer'],
+                # 'show_review_after_exam': exam_data['show_review_after_exam'],
                 'track_window_switches': exam_data['track_window_switches'],
                 'max_score': exam_data['max_score'],
                 'total_questions': len(exam_data['questions'])
@@ -363,7 +367,7 @@ def process_exam_answers(submission_id: int, answers: list) -> dict:
 def prepare_response(exam_id: int, total_score: float) -> dict:
     """הכנת תגובה לתלמיד על בסיס הגדרות המבחן"""
     try:
-        exam_info = get_exam_has_show_grade_and_passing_grade(exam_id)
+        exam_info = get_exam_completion_settings(exam_id)
 
         if not exam_info:
             return {
@@ -372,12 +376,12 @@ def prepare_response(exam_id: int, total_score: float) -> dict:
             }
 
         print("show_grade_and_passing_grade", exam_info)
-        show_grade = bool(exam_info["show_grade_immediately"])
+        show_grade = exam_info["show_grade_immediately"]
 
         response = {
             "success": True,
             "message": "Exam submitted and graded successfully",
-            "show_grade": show_grade,
+            "show_review_after_exam": exam_info["show_review_after_exam"],
         }
 
         if show_grade:

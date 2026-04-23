@@ -41,6 +41,7 @@ interface Exam {
     end_time: string | null;
     show_timer: boolean;
     show_grade_immediately: boolean;
+    show_review_after_exam: boolean;
     track_window_switches: boolean;
     max_score: number;
     status: 'draft' | 'active' | 'closed';
@@ -545,6 +546,10 @@ const ExamView = ({ user }: ExamViewProps) => {
                             <div className="stat-item">
                                 <span className="stat-label">הצגת ציון:</span>
                                 <span className="stat-value">{exam.show_grade_immediately ? 'מיידי' : 'מאוחר'}</span>
+                            </div>
+                            <div className="stat-item">
+                                <span className="stat-label">הצגת פתרונות:</span>
+                                <span className="stat-value">{exam.show_review_after_exam ? 'מופעל' : 'כבוי'}</span>
                             </div>
                             <div className="stat-item">
                                 <span className="stat-label">מעקב חלונות:</span>
