@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+
 import ExamDetailsForm from '../../components/ExamDetailsForm';
 import QuestionsList from '../../components/QuestionsList';
 import ExamSidebar from '../../components/ExamSidebar';
@@ -27,6 +28,7 @@ interface ExamDetails {
     end_time: string;
     show_timer: boolean;
     show_grade_immediately: boolean;
+    show_review_after_exam: boolean;
     track_window_switches: boolean;
 }
 
@@ -59,6 +61,7 @@ const EditExam = ({ user }: EditExamProps) => {
         end_time: '',
         show_timer: true,
         show_grade_immediately: false,
+        show_review_after_exam: false,
         track_window_switches: true,
     });
 
@@ -126,6 +129,7 @@ const EditExam = ({ user }: EditExamProps) => {
                         end_time: exam.end_time ? formatDateForInput(exam.end_time) : '',
                         show_timer: exam.show_timer ?? true,
                         show_grade_immediately: exam.show_grade_immediately ?? false,
+                        show_review_after_exam: exam.show_review_after_exam ?? false,
                         track_window_switches: exam.track_window_switches ?? true,
                     });
 

@@ -26,6 +26,7 @@ interface ExamDetails {
   end_time: string;
   show_timer: boolean;
   show_grade_immediately: boolean;
+  show_review_after_exam: boolean;
   track_window_switches: boolean;
 }
 
@@ -53,6 +54,7 @@ const CreateExam = ({ user }: CreateExamProps) => {
     end_time: '',
     show_timer: true,
     show_grade_immediately: false,
+    show_review_after_exam: false,
     track_window_switches: true,
   });
 

@@ -9,6 +9,7 @@ interface ExamDetails {
   end_time: string;   // YYYY-MM-DDTHH:mm | ''
   show_timer: boolean;
   show_grade_immediately: boolean;
+  show_review_after_exam: boolean;
   track_window_switches: boolean;
 }
 
@@ -175,6 +176,20 @@ const ExamDetailsForm = ({ examDetails, setExamDetails }: ExamDetailsFormProps) 
           />
           <label htmlFor="show_grade_immediately">
             הצג ציון מיד בסיום המבחן
+          </label>
+        </div>
+
+        <div className="edf-form-checkbox">
+          <input
+            type="checkbox"
+            id="show_review_after_exam"
+            checked={examDetails.show_review_after_exam}
+            onChange={(e) =>
+              handleInputChange('show_review_after_exam', e.target.checked)
+            }
+          />
+          <label htmlFor="show_review_after_exam">
+            הצג מבחן עם פתרונות בסיום המבחן
           </label>
         </div>
 

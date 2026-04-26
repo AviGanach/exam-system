@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+
 import OpenQuestion from '../../components/questions/OpenQuestion';
 import CodeQuestion from '../../components/CodeQuestion';
 import MultipleChoiceQuestion from '../../components/questions/MultipleChoiceQuestion';
@@ -7,6 +8,7 @@ import ExamTimer from '../../components/ExamTimer';
 import AntiCheatMonitor from '../../components/AntiCheatMonitor';
 import API_URL from '../../config';
 import './ExamTakingPage.css';
+
 
 interface User {
   token: string;
@@ -236,6 +238,14 @@ const ExamTakingPage: React.FC<ExamTakingPageProps> = ({ user }) => {
       } else {
         alert('✅ המבחן נשלח בהצלחה! הציון יהיה זמין אצל המורה.');
       }
+      console.log(data.show_review_after_exam);
+      
+      if (data.show_review_after_exam) {
+        console.log("SHOW",data.show_review_after_exam);
+        
+        // navigate('../ExamReview')
+      }
+
     } catch (err: any) {
       setIsSubmitting(false);
       setShowExplosion(false);
@@ -243,7 +253,7 @@ const ExamTakingPage: React.FC<ExamTakingPageProps> = ({ user }) => {
       alert('❌ שגיאה בשליחה: ' + err.message);
     }
     // בסיום המבחן חזור לדף הבית
-    navigate('/');
+    // navigate('/');
   };
 
   if (loading) return <div className="exam-loading">טוען מבחן...</div>;
