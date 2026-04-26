@@ -14,9 +14,9 @@ def create_exam_in_db(exam_details: Dict[str, Any]) -> Optional[int]:
                 INSERT INTO exams (
                     teacher_id, exam_code, title, description, 
                     duration_minutes, passing_grade, start_time, end_time,
-                    show_timer, show_grade_immediately, track_window_switches,
+                    show_timer, show_grade_immediately, show_review_after_exam, track_window_switches,
                     max_score, status
-                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
             """, (
                 exam_details['teacher_id'],
                 exam_details['exam_code'],
@@ -28,6 +28,7 @@ def create_exam_in_db(exam_details: Dict[str, Any]) -> Optional[int]:
                 exam_details['end_time'],
                 exam_details['show_timer'],
                 exam_details['show_grade_immediately'],
+                exam_details['show_review_after_exam'],
                 exam_details['track_window_switches'],
                 exam_details['max_score'],
                 exam_details['status']
@@ -64,6 +65,7 @@ def update_exam_details_db(exam_id: int, teacher_id: int, exam_details: Dict[str
                     end_time = %s,
                     show_timer = %s,
                     show_grade_immediately = %s,
+                    show_review_after_exam = %s,
                     track_window_switches = %s,
                     status = %s
                 WHERE id = %s AND teacher_id = %s
@@ -76,6 +78,7 @@ def update_exam_details_db(exam_id: int, teacher_id: int, exam_details: Dict[str
                 exam_details['end_time'],
                 exam_details['show_timer'],
                 exam_details['show_grade_immediately'],
+                exam_details['show_review_after_exam'],
                 exam_details['track_window_switches'],
                 exam_details['status'],
                 exam_id,
@@ -128,7 +131,7 @@ def get_exam_info_by_code(exam_code: str) -> Optional[Dict[str, Any]]:
             cursor.execute("""
                 SELECT id, title, description, start_time, end_time, 
                        duration_minutes, passing_grade, show_timer, 
-                       show_grade_immediately, track_window_switches, 
+                       show_grade_immediately, show_review_after_exam, track_window_switches, 
                        max_score, status
                 FROM exams 
                 WHERE exam_code = %s AND status = 'active'
@@ -291,12 +294,17 @@ def get_exam_for_teacher(exam_id: int, teacher_id: int):
         return None
 
 
-def get_exam_has_show_grade_and_passing_grade(exam_id: int) -> Dict[str, Any] | None:
-    """מחזיר פרטי ציון עובר והצגת ציון לפי exam_id"""
+def get_exam_completion_settings(exam_id: int) -> Dict[str, Any] | None:
+    """
+        מחזיר הגדרות מבחן לסיום:
+        - passing_grade: ציון עובר
+        - show_grade_immediately: האם להציג ציון בסיום
+        - show_review_after_exam: האם לאפשר סקירת מבחן מפורטת
+        """
     try:
         with db_cursor() as (conn, cursor):
             cursor.execute("""
-                SELECT passing_grade, show_grade_immediately
+                SELECT passing_grade, show_grade_immediately, show_review_after_exam
                 FROM exams
                 WHERE id = %s
             """, (exam_id,))
@@ -305,7 +313,8 @@ def get_exam_has_show_grade_and_passing_grade(exam_id: int) -> Dict[str, Any] | 
             if result:
                 return {
                     'passing_grade': result['passing_grade'],
-                    'show_grade_immediately': result['show_grade_immediately']
+                    'show_grade_immediately': result['show_grade_immediately'],
+                    'show_review_after_exam': result['show_review_after_exam']
                 }
             return None
 

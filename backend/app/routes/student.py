@@ -156,4 +156,3 @@ def submit_exam():
     except Exception as e:
         logger.error(f"Error in submit_exam route: {e}")
         return jsonify({'error': 'Server error'}), 500
-
