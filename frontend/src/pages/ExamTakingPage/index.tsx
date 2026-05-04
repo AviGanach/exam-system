@@ -196,6 +196,7 @@ const ExamTakingPage: React.FC<ExamTakingPageProps> = ({ user }) => {
       timeoutRef.current = setTimeout(() => {
         setIsSubmitting(true);
       }, 800);
+      console.log("Answers send to serves", answers);
 
       const response = await fetch(`${API_URL}/api/student/submit_exam`, {
         method: 'POST',
@@ -221,6 +222,8 @@ const ExamTakingPage: React.FC<ExamTakingPageProps> = ({ user }) => {
       });
 
       const data = await response.json();
+      console.log("After submtion exam -> respons from the server", data);
+
       if (!response.ok) throw new Error(data.error || 'שליחת מבחן נכשלה');
 
       // הפסקת האנימציה
@@ -232,19 +235,65 @@ const ExamTakingPage: React.FC<ExamTakingPageProps> = ({ user }) => {
       setShowExplosion(false);
       setButtonExploded(false);
 
-      if (data.show_grade === true) {
-        const passedText = data.passed ? '✅ עברת את המבחן!' : '❌ לא עברת את המבחן';
-        alert(`🎉 המבחן נשלח בהצלחה!\n\nהציון שלך: ${data.final_score}\n${passedText}`);
+      // 🔥 לוגיקה מעודכנת לפי כל התרחישים
+      const showGrade = data.show_grade === true;
+      console.log(showGrade);
+      const showReview = data.show_review_after_exam === true;
+      console.log(showReview);
+
+      if (showReview) {
+        // תרחישים A ו-B - יש סקירה
+        if (showGrade) {
+          // תרחיש A: סקירה מלאה + ציון
+          const passedText = data.passed ? '✅ עברת את המבחן!' : '❌ לא עברת את המבחן';
+          const confirmed = window.confirm(
+            `🎉 המבחן נשלח בהצלחה!\n\nהציון שלך: ${data.final_score}\n${passedText}\n\n האם ברצונך לראות סקירה מפורטת של המבחן עם הניקוד?`
+          );
+
+          if (confirmed) {
+            // navigate(`/student/exam/${exam.submission_id}/review`);
+            navigate(`/student/exam/${exam.submission_id}/review`, {
+              state: {
+                examInfo: exam.exam_info,
+                questions: exam.questions,
+                finalScore: data.final_score,
+                passed: passedText,
+                showGrade: data.show_grade,
+              }
+            });
+            return;
+          }
+        } else {
+          // תרחיש B: סקירה חלקית ללא ציון
+          const confirmed = window.confirm(
+            '✅ המבחן נשלח בהצלחה!\n\nהאם ברצונך לראות סקירה של התשובות עם הסברים?'
+          );
+
+          if (confirmed) {
+            navigate(`/student/exam/${exam.submission_id}/review`, {
+              state: {
+                examInfo: exam.exam_info,
+                questions: exam.questions,
+                showGrade: data.show_grade,
+              }
+            });
+            return;
+          }
+        }
       } else {
-        alert('✅ המבחן נשלח בהצלחה! הציון יהיה זמין אצל המורה.');
+        // תרחישים C ו-D - אין סקירה
+        if (showGrade) {
+          // תרחיש C: ציון בלבד
+          const passedText = data.passed ? '✅ עברת את המבחן!' : '❌ לא עברת את המבחן';
+          alert(`🎉 המבחן נשלח בהצלחה!\n\nהציון שלך: ${data.final_score}\n${passedText}`);
+        } else {
+          // תרחיש D: אין ציון ואין סקירה
+          alert('✅ המבחן נשלח בהצלחה! הציון יהיה זמין אצל המורה.');
+        }
       }
-      console.log(data.show_review_after_exam);
-      
-      if (data.show_review_after_exam) {
-        console.log("SHOW",data.show_review_after_exam);
-        
-        // navigate('../ExamReview')
-      }
+
+      // בסיום חזור לדף הבית
+      navigate('/');
 
     } catch (err: any) {
       setIsSubmitting(false);
@@ -252,9 +301,31 @@ const ExamTakingPage: React.FC<ExamTakingPageProps> = ({ user }) => {
       setButtonExploded(false);
       alert('❌ שגיאה בשליחה: ' + err.message);
     }
-    // בסיום המבחן חזור לדף הבית
-    // navigate('/');
   };
+
+  //     if (data.show_grade === true) {
+  //       const passedText = data.passed ? '✅ עברת את המבחן!' : '❌ לא עברת את המבחן';
+  //       alert(`🎉 המבחן נשלח בהצלחה!\n\nהציון שלך: ${data.final_score}\n${passedText}`);
+  //     } else {
+  //       alert('✅ המבחן נשלח בהצלחה! הציון יהיה זמין אצל המורה.');
+  //     }
+  //     console.log(data.show_review_after_exam);
+
+  //     if (data.show_review_after_exam) {
+  //       console.log("SHOW",data.show_review_after_exam);
+
+  //       // navigate('../ExamReview')
+  //     }
+
+  //   } catch (err: any) {
+  //     setIsSubmitting(false);
+  //     setShowExplosion(false);
+  //     setButtonExploded(false);
+  //     alert('❌ שגיאה בשליחה: ' + err.message);
+  //   }
+  //   // בסיום המבחן חזור לדף הבית
+  //   // navigate('/');
+  // };
 
   if (loading) return <div className="exam-loading">טוען מבחן...</div>;
   if (error) return <div className="exam-error">{error}</div>;
@@ -296,7 +367,13 @@ const ExamTakingPage: React.FC<ExamTakingPageProps> = ({ user }) => {
 
       {exam.questions.map((q: any, index: number) => (
         <div key={q.id} className="question-wrapper">
-          <h2 className="question-number">שאלה {index + 1}</h2>
+          <div className="question-header">
+            <h2 className="question-number">שאלה {index + 1}</h2>
+            <div className="question-points">
+              <span className="points-value">{q.points}</span>
+              <span className="points-label">נקודות</span>
+            </div>
+          </div>
           <p className="question-text">{q.question_text}</p>
 
           {q.question_type === 'open_text' && (

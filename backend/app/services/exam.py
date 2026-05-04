@@ -381,7 +381,7 @@ def prepare_response(exam_id: int, total_score: float) -> dict:
         response = {
             "success": True,
             "message": "Exam submitted and graded successfully",
-            "show_review_after_exam": exam_info["show_review_after_exam"],
+            "show_review_after_exam": bool(exam_info["show_review_after_exam"]),
         }
 
         if show_grade:

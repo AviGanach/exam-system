@@ -3,7 +3,11 @@ import string
 import os
 import logging
 import re
+import time
+
 import google.generativeai as genai
+# from openai import OpenAI
+
 from dotenv import load_dotenv
 
 
@@ -14,11 +18,24 @@ load_dotenv()
 
 # הגדרת Google Gemini API
 gemini_api_key = os.getenv('GEMINI_API_KEY')
+# הגדרות DEEPSEEK
+# deepseek_api_key = os.getenv('DEEPSEEK_API_KEY')
+
+# GEMINI
 if gemini_api_key:
     genai.configure(api_key=gemini_api_key)
     model = genai.GenerativeModel('models/gemini-2.5-flash')
 else:
     model = None
+
+# DEEPEEK
+# if deepseek_api_key:
+#     client = OpenAI(
+#         api_key=deepseek_api_key,
+#         base_url="https://api.deepseek.com"
+#     )
+# else:
+#     client = None
 
 def generate_verification_code():
     """יוצר קוד אימות 4 ספרות"""
@@ -26,42 +43,68 @@ def generate_verification_code():
 
 def _get_ai_grading(prompt: str, max_points: int, max_tokens: int) -> tuple[int, str]:
     """פונקציה פנימית לניהול התקשורת מול ה-AI וחילוץ הנתונים"""
-    try:
-        if not model or not gemini_api_key:
-            return max_points // 2, "API not configured"
+    max_retries = 3
 
-        response = model.generate_content(
-            prompt,
-            generation_config=genai.types.GenerationConfig(
-                max_output_tokens=max_tokens,
-                temperature=0.2,
+    for attempt in range(max_retries):
+        try:
+            # GEMINI
+            if not model or not gemini_api_key:
+                return max_points // 2, "API not configured"
+
+            response = model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    max_output_tokens=max_tokens,
+                    temperature=0.2,
+                )
             )
-        )
 
-        if not response.candidates or not response.candidates[0].content.parts:
-            return max_points // 2, "Empty response from AI"
+            if not response.candidates or not response.candidates[0].content.parts:
+                return max_points // 2, "Empty response from AI"
 
-        response_text = response.text.strip()
+            # DEEPSEEK
+            # if not client or not deepseek_api_key:
+            #     return max_points // 2, "API not configured"
+            #
+            # response = client.chat.completions.create(
+            #     model="deepseek-chat",
+            #     messages=[
+            #         {"role": "user", "content": prompt}
+            #     ],
+            #     max_tokens=max_tokens,
+            #     temperature=0.2,
+            # )
 
-        # חילוץ ציון בעזרת Regex
-        score = 0
-        score_match = re.search(r'SCORE:\s*(\d+)', response_text, re.IGNORECASE)
-        if score_match:
-            score = int(score_match.group(1))
 
-        # חילוץ הסבר בעזרת Regex
-        explanation = "לא ניתן לפרסר הסבר"
-        explanation_match = re.search(r'EXPLANATION:\s*(.*)', response_text, re.IGNORECASE | re.DOTALL)
-        if explanation_match:
-            explanation = explanation_match.group(1).strip().replace('**', '')
+            response_text = response.text.strip()
 
-        score = max(0, min(score, max_points))
-        return score, explanation
+            # חילוץ ציון בעזרת Regex
+            score = 0
+            score_match = re.search(r'SCORE:\s*(\d+)', response_text, re.IGNORECASE)
+            if score_match:
+                score = int(score_match.group(1))
 
-    except Exception as e:
-        logger.error(f"AI Communication Error: {e}")
-        return max_points // 2, f"Error: {str(e)}"
+            # חילוץ הסבר בעזרת Regex
+            explanation = "לא ניתן לפרסר הסבר"
+            explanation_match = re.search(r'EXPLANATION:\s*(.*)', response_text, re.IGNORECASE | re.DOTALL)
+            if explanation_match:
+                explanation = explanation_match.group(1).strip().replace('**', '')
 
+            score = max(0, min(score, max_points))
+            return score, explanation
+
+        except Exception as e:
+            if '429' in str(e):
+                wait_time = 10 * (attempt + 1)  # 10, 20, 30 שניות
+                logger.warning(f"Rate limit hit, waiting {wait_time}s... (attempt {attempt + 1}/{max_retries})")
+                time.sleep(wait_time)
+            else:
+                logger.error(f"AI Communication Error: {e}")
+                return max_points // 2, f"Error: {str(e)}"
+
+    # אם נכשל אחרי כל הניסיונות
+    logger.error("Max retries reached after rate limit errors")
+    return max_points // 2, "שירות AI עמוס, נסה שוב מאוחר יותר"
 
 def grade_open_text_question_with_ai(question_text: str, correct_answer: str,
                                      student_answer: str, max_points: int) -> tuple[int, str]:

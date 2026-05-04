@@ -5,9 +5,10 @@ from typing import Dict, Any
 
 from flask_jwt_extended import create_access_token
 
-from app.models.exam import get_exam_info_by_code, is_exam_available
+from app.models.exam import get_exam_info_by_code, is_exam_available, get_exam_completion_settings
 from app.models.exam_submission import get_submission_status_by_student
 from app.models.student import get_or_create_student
+from app.models.student_answer import get_student_answers_data
 
 logger = logging.getLogger(__name__)
 
@@ -68,3 +69,33 @@ def register_student_for_exam(name: str, id_number: str, email: str, exam_code: 
     except Exception as e:
         logger.error(f"Error in register_student_for_exam: {e}")
         return {'success': False, 'error': 'Registration failed'}
+
+def get_exam_review_service(student_id: int, exam_id: int, submission_id: int) -> Dict[str, Any]:
+    """
+    מחזיר נתונים מפורטים לסקירת תוצאות מבחן שהסתיים
+    תומך במצב A (סקירה עם ציונים) ומצב B (סקירה ללא ציונים)
+    """
+    try:
+        # בדיקות קיימות...
+        submission_status = get_submission_status_by_student(student_id, exam_id)
+
+        if not submission_status['success']:
+            return {'success': False, 'message': 'Database error'}
+
+        if not submission_status['found']:
+            return {'success': False, 'message': 'Exam submission not found'}
+
+        if submission_status['status'] != 'completed':
+            return {'success': False, 'message': 'Exam not completed yet'}
+
+        # קבלת כל הנתונים לתשובות הסטודנט מהטבלה הקיימת
+        answers_data = get_student_answers_data(submission_id)
+        print(answers_data)
+        if not answers_data:
+            return {'success': False, 'message': 'No review data found'}
+
+        return {'success': True, 'data': answers_data}
+
+    except Exception as e:
+        logger.error(f"Error in get_exam_review_service: {e}")
+        return {'success': False, 'message': 'Server error during review generation'}
