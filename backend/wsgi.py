@@ -114,7 +114,6 @@ def hello():
         'status': 'healthy'
     }
 
-
 @app.route('/health')
 def health_check():
     """בדיקת תקינות מתקדמת"""
@@ -143,7 +142,7 @@ if __name__ == '__main__':
         exit(1)
 
     # הגדרות הפעלה
-    debug_mode = os.getenv('FLASK_DEBUG', 'True').lower() == 'true'
+    debug_mode = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
     port = int(os.getenv('FLASK_PORT', 5002))
     host = os.getenv('FLASK_HOST', '127.0.0.1')
 
