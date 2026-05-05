@@ -9,9 +9,9 @@ import ExamView from './pages/ExamView';
 import EditExamDetails from './pages/EditExamDetails';
 import EditExamContent from './pages/EditExamContent';
 import ExamRegister from './pages/ExamRegister';
-import CodeQuestion from './components/questions/CodeQuestion';
 import ExamTakingPage from './pages/ExamTakingPage';
 import ExamResults from './pages/ExamResults';
+import ExamReview from './pages/ExamReview';
 
 import './App.css';
 
@@ -36,7 +36,6 @@ function App() {
         <main>
           <Routes>
             <Route path="/" element={<HomePage setUser={setUser} />} />
-            <Route path="check" element={<CodeQuestion initial_code="" onChange={() => {}} />} />
 
             {/* ----- Admin Routes ----- */}
             <Route path="/admin" element={<AuthGuard requiredRole="admin" />}>
@@ -57,6 +56,7 @@ function App() {
             <Route path="/student">
               <Route path="exam/:examCode/register" element={<ExamRegister setUser={setUser} />} />
               <Route path="exam/:examCode/start" element={user ? <ExamTakingPage user={user}/> : <Navigate to="/" replace />} />
+              <Route path="exam/:submissionId/review" element={user ? <ExamReview user={user}/>: <Navigate to="/" replace />} />
             </Route>
 
             {/* ברירת מחדל */}

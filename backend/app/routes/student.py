@@ -7,7 +7,7 @@ from flask import Blueprint, request, jsonify, Response
 from flask_jwt_extended import jwt_required, get_jwt
 
 from app.services.exam import get_exam_info_service, get_exam_service, submit_exam_service
-from app.services.student import register_student_for_exam
+from app.services.student import register_student_for_exam, get_exam_review_service
 
 logger = logging.getLogger(__name__)
 
@@ -155,4 +155,35 @@ def submit_exam():
 
     except Exception as e:
         logger.error(f"Error in submit_exam route: {e}")
+        return jsonify({'error': 'Server error'}), 500
+
+
+
+@student_bp.route('/exam/<submission_id>/review', methods=['GET'])
+@jwt_required()
+def get_exam_review(submission_id):  # זה יגיע כstring
+    try:
+        claims = get_jwt()
+        student_id = claims.get('student_id')
+        exam_id = claims.get('exam_id')
+
+        if not student_id:
+            return jsonify({'error': 'Invalid token'}), 401
+
+        try:
+            submission_id = int(submission_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid submission ID'}), 400
+
+        review_data = get_exam_review_service(student_id, exam_id, submission_id)
+
+        if review_data['success']:
+            return jsonify(review_data['data']), 200
+        else:
+            # החזרת הודעות שגיאה ברורות
+            status_code = 403 if 'not available' in review_data['message'] else 400
+            return jsonify({'error': review_data['message']}), status_code
+
+    except Exception as e:
+        logger.error(f"Error in get_exam_review route: {e}")
         return jsonify({'error': 'Server error'}), 500

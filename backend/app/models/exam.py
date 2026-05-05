@@ -223,9 +223,6 @@ def get_exam(exam_id: int) -> Optional[Dict[str, Any]]:
         logger.error(f"Database error in get_exam_with_questions: {e}")
         return None
 
-
-# models/exam.py
-
 def delete_exam_cascade(exam_id: int, teacher_id: int) -> bool:
     """
     מחיקה מדורגת מלאה של מבחן ואת כל הנתונים הקשורים

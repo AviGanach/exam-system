@@ -77,3 +77,31 @@ def insert_student_answer(
         return False
 
 
+def get_student_answers_data(submission_id: int) -> list[Dict[str, Any]]:
+    """
+    קבלת המידע על תשובות התלמיד לצורך הסקירה
+    :param submission_id:
+    :return:
+    """
+    try:
+        with db_cursor() as (conn, cursor):
+            cursor.execute("""
+            SELECT
+                sa.question_id, 
+                sa.answer_text,
+                sa.selected_option,
+                sa.score,
+                sa.max_question_score,
+                sa.ai_explanation,
+                q.correct_answer
+            FROM student_answers AS sa
+            JOIN questions q ON sa.question_id = q.id
+            WHERE sa.submission_id = %s   
+            """, (submission_id,))
+
+            results = cursor.fetchall()
+            return results
+
+    except Exception as e:
+        logger.error(f"Database error get data student answers: {e}")
+        return []
