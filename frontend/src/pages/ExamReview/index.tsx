@@ -73,6 +73,7 @@ const ExamReview: React.FC<ExamReviewProps> = ({ user }) => {
         }
 
         fetchStudentAnswers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [submissionId]);
 
     const fetchStudentAnswers = async () => {
