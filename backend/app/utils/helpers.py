@@ -5,11 +5,11 @@ import logging
 import re
 import time
 
-import google.generativeai as genai
-# from openai import OpenAI
+from google import genai
+from google.genai import types
+# from openai import OpenAI # אופציה למעבר ל-DEEPSEEK אם נרצה להשתמש בו במקום GEMINI
 
 from dotenv import load_dotenv
-
 
 logger = logging.getLogger(__name__)
 
@@ -23,10 +23,9 @@ gemini_api_key = os.getenv('GEMINI_API_KEY')
 
 # GEMINI
 if gemini_api_key:
-    genai.configure(api_key=gemini_api_key)
-    model = genai.GenerativeModel('models/gemini-2.5-flash')
+    client = genai.Client(api_key=gemini_api_key)
 else:
-    model = None
+    client = None
 
 # DEEPEEK
 # if deepseek_api_key:
@@ -48,12 +47,13 @@ def _get_ai_grading(prompt: str, max_points: int, max_tokens: int) -> tuple[int,
     for attempt in range(max_retries):
         try:
             # GEMINI
-            if not model or not gemini_api_key:
+            if not client or not gemini_api_key:
                 return max_points // 2, "API not configured"
-
-            response = model.generate_content(
-                prompt,
-                generation_config=genai.types.GenerationConfig(
+         
+            response = client.models.generate_content(
+                model='gemini-2.5-flash',
+                contents=prompt,
+                config=types.GenerateContentConfig(
                     max_output_tokens=max_tokens,
                     temperature=0.2,
                 )
@@ -76,7 +76,10 @@ def _get_ai_grading(prompt: str, max_points: int, max_tokens: int) -> tuple[int,
             # )
 
 
-            response_text = response.text.strip()
+            response_text = (response.text or "").strip()
+
+            if not response_text:
+                return max_points // 2, "Empty response from AI"
 
             # חילוץ ציון בעזרת Regex
             score = 0
@@ -130,7 +133,6 @@ def grade_open_text_question_with_ai(question_text: str, correct_answer: str,
         print(
             f"--- OPEN TEXT GRADING ---\nScore: {score}/{max_points_int}\nExplanation: {explanation}\n--------------------------")
         return score, explanation
-
     except Exception as e:
         logger.error(f"Error in open text grading: {e}")
         return int(max_points) // 2, "Error in open text grading"

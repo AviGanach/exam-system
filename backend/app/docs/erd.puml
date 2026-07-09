@@ -26,6 +26,12 @@ entity "exams" {
   description : text
   exam_code : varchar
   max_score : int
+  show_grade_immediately : boolean
+  show_review_after_exam : boolean
+  passing_grade : int
+  duration_minutes : int
+  show_timer : boolean
+  track_window_switches : boolean
   status : varchar
   created_at : datetime
   updated_at : datetime
@@ -73,6 +79,8 @@ entity "exam_submissions" {
   total_score : int
   max_score : int
   window_switches : int
+  status : varchar
+  total_away_time : int
   created_at : datetime
 }
 
@@ -82,8 +90,8 @@ entity "student_answers" {
   submission_id : int
   question_id : int
   selected_option : varchar
-  code_answer : text
-  open_answer : text
+  answer_text : text
+  ai_explanation : text
   is_correct : boolean
   score : int
   max_question_score : int
